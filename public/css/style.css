@@ -1,0 +1,319 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+*{
+  margin: 0;
+  outline: none;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+ 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+ 
+  overflow: hidden;
+  padding-bottom: 150px;
+}
+/* ---------------------------------------------login page --------------------------------------------- */
+
+
+body {
+  display: flex;
+  height: 100vh;          
+  overflow: hidden;
+  font-family: 'DM Sans', sans-serif;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+
+/* ------------------------------------shapes css----------------------------------------- */
+
+.logo {
+  top: 1vh;
+  position: fixed;
+  width: 7vw;
+  height: auto;
+  left: 2vw;
+}
+
+.top-right {
+  position: fixed;
+  width: 20vw;
+  height: auto;
+  top: 0;
+  right: -.1vw;
+}
+
+.bottom-left {
+  height: 65vh;
+  position: fixed;
+  width: 40vw;
+  bottom: -1.2vh;
+  left: -10vw
+}
+
+
+
+
+
+/* -----------------------------------------------forms---------------------------------------------------- */
+.container {
+  width: 800px;
+  height: 500px;
+  background: #fff;
+  text-align: center;
+  border-radius: 10px;
+  padding: 50px 35px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+
+}
+
+.container header{
+  font-size: 25px;
+  font-weight: 600;
+  margin: 0 0 30px 0;
+}
+.container .form-outer{
+  width: 100%;
+  overflow: hidden;
+}
+.container .form-outer form{
+  display: flex;
+  width: 400%;
+}
+.form-outer form .page{
+  width: 25%;
+  transition: margin-left 0.3s ease-in-out;
+}
+.form-outer form .page .title{
+  text-align: left;
+  font-size: 25px;
+  font-weight: 500;
+}
+.form-outer form .page .field{
+  width: 330px;
+  height: 30px;
+  margin: 45px 0;
+  display: flex;
+  position: relative;
+}
+form .page .field .label{
+
+  position: absolute;
+  top: -30px;
+  font-weight: 500;
+}
+form .page .field input{
+  height: 100%;
+  width: 100%;
+  border: 1px solid lightgrey;
+  border-radius: 5px;
+  padding-left: 15px;
+  font-size: 18px;
+}
+form .page .field select{
+  width: 100%;
+  padding-left: 10px;
+  font-size: 17px;
+  font-weight: 500;
+}
+form .page .field button{
+  width: 100%;
+  height: calc(100% + 5px);
+  border: none;
+  background: #d33f8d;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: 0.5s ease;
+  
+}
+form .page .field button:hover{
+  background: #000;
+}
+form .page .btns button{
+  margin-top: -45px!important;
+}
+form .page .btns button.prev{
+  margin-right: 3px;
+  font-size: 17px;
+}
+form .page .btns button.next{
+  margin-left: 3px;
+}
+.container .progress-bar{
+  display: flex;
+  margin: 40px 0;
+  user-select: none;
+}
+.container .progress-bar .step{
+  text-align: center;
+  width: 100%;
+  position: relative;
+}
+.container .progress-bar .step p{
+  font-weight: 500;
+  font-size: 18px;
+  color: #000;
+  margin-bottom: 8px;
+}
+.progress-bar .step .bullet{
+  height: 25px;
+  width: 25px;
+  border: 2px solid #000;
+  display: inline-block;
+  border-radius: 50%;
+  position: relative;
+  transition: 0.2s;
+  font-weight: 500;
+  font-size: 17px;
+  line-height: 25px;
+}
+.progress-bar .step .bullet.active{
+  border-color: #d43f8d;
+  background: #d43f8d;
+}
+.progress-bar .step .bullet span{
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.progress-bar .step .bullet.active span{
+  display: none;
+}
+.progress-bar .step .bullet:before,
+.progress-bar .step .bullet:after{
+  position: absolute;
+  content: '';
+  bottom: 11px;
+  right: -170px;
+  height: 3px;
+  width: 170px;
+  background: #262626;
+}
+.progress-bar .step .bullet.active:after{
+  background: #d43f8d;
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: animate 0.3s linear forwards;
+}
+@keyframes animate {
+  100%{
+    transform: scaleX(1);
+  }
+}
+.progress-bar .step:last-child .bullet:before,
+.progress-bar .step:last-child .bullet:after{
+  display: none;
+}
+.progress-bar .step p.active{
+  color: #d43f8d;
+  transition: 0.2s linear;
+}
+.progress-bar .step .check{
+  position: absolute;
+  left: 50%;
+  top: 70%;
+  font-size: 15px;
+  transform: translate(-50%, -50%);
+  display: none;
+}
+.progress-bar .step .check.active{
+  display: block;
+  color: #fff;
+}
+
+.flex{
+  display: flex;
+
+  gap: 80px;
+margin-top: -50px;
+justify-content: center;
+justify-items: center;
+align-items: center;
+}
+.flex:first-of-type{
+  margin-top: 0px;
+}
+
+textarea {
+  width: 70%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  resize: vertical; /* user can resize only up-down */
+  margin-bottom: 50px;
+ 
+}#summary {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  max-width: 500px;
+margin: 20px auto;
+margin-top: -20px;
+
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+
+  /* 👇 New rules */
+  max-height: 300px;   /* keep it inside container */
+  overflow-y: auto;    /* vertical scroll only */
+  scrollbar-width: thin; /* Firefox nice slim scrollbar */
+}
+#summary::-webkit-scrollbar {
+  width: 6px;
+}
+#summary::-webkit-scrollbar-thumb {
+  background: #d43f8d;
+  border-radius: 10px;
+}
+#summary::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+
+#summary h2 {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+#summary p {
+  display: flex;
+  align-items: flex-start;
+  margin: 8px 0;
+  font-size: 16px;
+  color: #444;
+}
+
+#summary strong {
+  color: #007bff;   /* highlight labels with blue */
+  font-weight: 600;
+  min-width: 150px; /* keeps labels aligned */
+  flex-shrink: 0;
+}
+
+#summary span {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  flex: 1;
+}
+

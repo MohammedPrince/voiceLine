@@ -1,0 +1,214 @@
+
+body {
+      font-family: Arial, sans-serif;
+      background: #f5f6fa;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .logo {
+  top: 1vh;
+  position: fixed;
+  width: 7vw;
+  height: auto;
+  left: 2vw;
+   z-index: -1;
+}
+
+    .top-right {
+  position: fixed;
+  width: 16vw;
+  height: auto;
+  top: 0;
+  right: -1vw;
+   z-index: -1;
+}
+
+.bottom-left {
+  height: 60vh;
+  position: fixed;
+  width: 40vw;
+  bottom: -2vh;
+  left: -18vw;
+  z-index: -1;
+  
+}
+    .flex{
+      display: flex;
+      flex-wrap: wrap;
+    
+    }
+    form {
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+      max-width: 900px;
+      width: 100%;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+
+    .flex {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+
+    .field {
+      flex: 1;
+      min-width: 220px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .label {
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #34495e;
+    }
+
+    input, select, textarea {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.2s ease-in-out;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #2980b9;
+      box-shadow: 0px 0px 5px rgba(41, 128, 185, 0.3);
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    button:hover {
+      background: #1c5980;
+    }
+   
+.btn button {
+      width: 100%;
+      border-radius: 10px;
+      background-color: #EC8305;
+      transition: ease-in-out 0.2s ;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .btn button:hover {
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); 
+      background-color: #EC8305;
+      transform: translateY(-4px); 
+    }
+    .field { margin-bottom: 15px; }
+    .label { font-weight: 600; margin-bottom: 6px; }
+    input, select, textarea { width: 100%; padding: 6px; }
+
+    /* Default hidden */
+    #parent-field, #faculty-field, #batch-field, #major-field, #index-field, #id-field {
+      display: none;
+    }
+
+    /* Tabs styling */
+    
+    form{
+        padding: 50px;
+    }
+    p b {
+        color: #EC8305;
+    }
+   .radio-group {
+  display: flex;
+  justify-content: center;
+  
+  gap: 60px;
+  position: relative;
+  background: #f4f4f4;
+  padding: 10px;
+  border-radius: 30px;
+  width: fit-content;
+  margin: 50px auto;
+}
+
+/* Hide radios */
+.radio-group input {
+  display: none;
+}
+
+.radio-group label {
+  display: flex;              /* use flexbox */
+  align-items: center;        /* vertical center */
+  justify-content: center;    /* horizontal center */
+  padding: 0 20px;            /* spacing left/right */
+  height: 35px;               /* same height as slider */
+  cursor: pointer;
+  border-radius: 20px;
+  font-family: sans-serif;
+  font-size: 14px;
+  color: #333;
+  position: relative;
+  z-index: 1;
+  user-select: none;
+  text-align: center;
+}
+
+/* The sliding background */
+.slider {
+  position: absolute;
+  top: 10px;           /* match label top */
+  left: 0;          /* JS moves it horizontally */
+  background: #EC8305;        
+  border-radius: 20px;
+  z-index: 0;
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+
+/* Active text turns white */
+.radio-group label.active {
+  color: white;
+}
+/* Default: show labels, hide icons */
+.radio-group label span {
+  display: inline; /* show text */
+}
+.tabicon {
+  display: none;
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+}
+.radio-group label.active .tabicon {
+  filter: brightness(0) invert(1); /* makes dark icons appear white */
+}
+
+
+/* Responsive: hide text, show icons */
+@media (max-width: 768px) {
+  .radio-group label span {
+    display: none; /* hide text inside label */
+  }
+   .radio-group{
+    gap: 20px;
+   }
+  .tabicon {
+    display: inline-block;
+  }
+  .bottom-left{
+
+    bottom: -10vh;
+  }
+}
+
