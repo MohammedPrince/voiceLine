@@ -4,10 +4,10 @@
 @section('title', 'Home Page')
  
 @section('content')
-  <div class="choices">
+  <!-- <div class="choices"> -->
    
     <!-- Optional additional nav items -->
-        <a class="choice" href="javascript:void(0);">
+        <!-- <a class="choice" href="javascript:void(0);">
             <span>Get Direct Call</span>
         </a>
        
@@ -16,6 +16,13 @@
         <span>Start a call/ticket</span>
     </a>
 
-</div>
+</div> -->
+ <div class="choices">
+        
 
+    <a class="choice" href="{{ route('student') }}">
+        <span>Call Entry</span>
+    </a>
+    
+</div>
 @endsection

@@ -1,49 +1,12 @@
+
+
 @extends('layouts.app')
 
+@section('title', 'Profile Page')
+
 @section('content')
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Profile</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="css/login.css">
-  <style>
-    body {
-      background: #f8f9fa;
-    }
-    .profile-card {
-      max-width: 600px;
-      margin: 50px auto;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
-      padding: 30px;
-    }
-    .profile-header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .profile-header i {
-      font-size: 80px;
-      color: #6b4226;
-    }
-  </style>
-</head>
-<body>
-<picture>
-    <source srcset="assets/logowithname.svg" type="image/svg+xml">
-    <img src="assets/logowithname.svg" class="logo" alt="logo" draggable="false">
-  </picture>
 
-  <!-- Top-left image -->
-  <img src="assets/bottomleft.svg" class="bottom-left" alt="bottomleft" draggable="false">
-  <!-- Bottom-right image -->
-  <img src="assets/topright.svg" class="top-right" alt="topright" draggable="false">
-
-  <div class="profile-card">
+  <div class="user-profile-card">
     
     <div class="profile-info">
       <h5>User Information</h5>
@@ -78,8 +41,7 @@
       
     </div>
   </div>
-
-  <!-- Update Modal -->
+<!-- Update Modal -->
 <!-- Update Modal -->
 <div class="modal fade" id="updateModal" tabindex="-1">
   <div class="modal-dialog">
@@ -160,17 +122,8 @@
           </div>
         </div>
       </form>
-
     </div>
   </div>
 </div>
-
-
-
-
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
-@yield('content');
+@endsection
  
