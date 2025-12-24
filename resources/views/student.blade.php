@@ -47,7 +47,7 @@
             </label>
         </div>
     </div>
-    <div calss="call-form" style="margin-top:-10vh;">
+    <div class="call-form" style="margin-top:-10vh;">
         <!-- Always visible -->
         <div class="field" id="index-field" style="display: flex; flex-direction: row; gap: 20px;">
             <div style="flex: 1 1 25%;">
@@ -340,7 +340,7 @@
                     staffId: document.getElementById("staff-id-field"),
                 };
 
-                const labels = document.querySelectorAll(".radio-group label");
+                // const labels = document.querySelectorAll(".radio-group label");
                 const slider = document.querySelector(".slider");
 
                 // Position slider behind the selected label
@@ -428,12 +428,6 @@
                         }
 
                     }
-
-
-
-
-
-
                 );
 
                 function getStudentRecord(studentId) {
@@ -507,7 +501,6 @@
                                 subjectsTable.innerHTML =
                                     `<tr><td colspan="4" class="text-center">No data available</td></tr>`;
                             }
-
 
 
                         })

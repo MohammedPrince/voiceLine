@@ -138,24 +138,20 @@
     </main>
 
     <!-- Card -->
-    <div class="profile-card" data-bs-toggle="modal" data-bs-target="#cardModal">
-        <div class="profile-img">
-            <img src="assets/96765adfcc834ea1ad53be69c3d61be9.jpeg" alt="Profile">
-        </div>
+    <!-- <div class="profile-card" data-bs-toggle="modal" data-bs-target="#cardModal">
+       
         <div class="name">Ms. Mohammed</div>
         <p>ID:125058</p>
         <h6>Morning Shift</h6>
         <div class="info">User Email: <span>Mohamed@gmail.com</span></div>
         <div class="info">Shift Received Calls <span>11 calls</span></div>
-        <div class="info">Session Start Time: <span>09:00AM</span></div>
-        <div class="info">Session End Time <span>05:18PM</span></div>
         <div class="info">Total Hours: <span>1:30:37</span></div>
     </div>
 
 
 
     <!-- Modal -->
-    <div class="modal fade" id="cardModal" tabindex="-1" aria-hidden="true">
+    <!-- <div class="modal fade" id="cardModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -163,13 +159,13 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
+                    <div class="row"> -->
                         <!-- Left side: user info -->
-                        <div class="col-md-5" style="padding: 40px;">
-                            <div class="d-flex align-items-center mb-3">
-                                <img src="assets/96765adfcc834ea1ad53be69c3d61be9.jpeg" class="rounded-circle me-3"
-                                    alt="Profile">
-                                <div>
+                        <!-- <div class="col-md-5" style="padding: 40px;">
+                            <div class="d-flex align-items-center mb-3"> -->
+                                <!-- <img src="assets/96765adfcc834ea1ad53be69c3d61be9.jpeg" class="rounded-circle me-3"
+                                    alt="Profile"> -->
+                                <!-- <div>
                                     <h5 class="mb-0">Ms. Mohammed </h5>
                                     <p>ID:125058</p>
                                     <small>Morning Shift</small>
@@ -180,25 +176,28 @@
                             <p>Session Start Time: <b>09:00AM</b></p>
                             <p>Session End Time: <b>05:18PM</b></p>
                             <p>Total Hours: <b>1:30:37</b></p>
-                        </div>
+                        </div> -->
 
                         <!-- Right side: per-hour chart -->
-                        <div class="col-md-7">
+                        <!-- <div class="col-md-7">
                             <div class="card" role="region" aria-label="Calls per hour chart">
                                 <h1>Calls per hour</h1>
 
                                 <div class="chart-wrap">
                                     <canvas id="callsChart" aria-label="Bar chart showing calls per hour"
-                                        role="img"></canvas>
+                                        role="img" style="margin-top:-5px"></canvas>
                                 </div>
 
-                                <div class="controls" style="align-items:center; margin-top: -140px;">
-                                    <button class="secondary" id="downloadCsvBtn">Download CSV</button>
-                                </div>
-                            </div> <!-- end card -->
-                        </div> <!-- end col-md-7 -->
+   <div class="controls d-flex justify-content-center mt-2" >
+    <button class="view-btn" id="downloadCsvBtn"style="margin-top:-10px;">Download CSV</button>
+</div> -->
+
+                            <!-- </div> -->
+                             <!-- end card -->
+                        <!-- </div>  -->
+                        <!-- end col-md-7 -->
                         <!-- Active Users Table -->
-                        <h3 class=" mt-4">Call Archive</h3>
+                        <!-- <h3 class=" mt-4">Call Archive</h3>
                         <table class="table table-striped table-bordered text-center">
                             <thead class="custom-header">
                                 <tr>
@@ -211,12 +210,13 @@
                                     <th>Final Status</th>
                                 </tr>
                             </thead>
-                            <tbody id="userTableBody">
+                            <tbody id="userTableBody"> -->
                                 <!-- Filled by JS -->
-                            </tbody>
-                        </table>
+                            <!-- </tbody>
+                        </table> -->
 
-                    </div> <!-- end row -->
+                    <!-- </div>  -->
+                    <!-- end row -->
                 </div>
                 <!-- أزرار التمرير -->
                 <button class="scroll-to-top" id="scrollToTop" title="انتقل إلى الأعلى">
