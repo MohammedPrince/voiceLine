@@ -6,7 +6,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'voice Line System')</title>
-
+ <base href="{{ url('/') }}/">
     <!-- Bootstrap + Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
@@ -103,7 +103,7 @@
 
     <!-- Decorative Images -->
     <img src="{{ asset('assets/bottomleft.svg') }}" class="bottom-left" alt="bottomleft" draggable="false">
-    <img src="{{ asset('public/assets/topright.svg') }}" class="top-right" alt="topright" draggable="false">
+    <img src="{{ asset('assets/topright.svg') }}" class="top-right" alt="topright" draggable="false">
 
     <!-- User Profile Dropdown -->
     <div class="profile">
