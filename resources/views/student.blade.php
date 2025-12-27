@@ -25,25 +25,26 @@
             <input type="radio" name="customer_type" id="caller-student" value="student" hidden checked>
             <label for="caller-student">
                 <span>Student</span>
-                <img src="assets/student.png" alt="student" class="tabicon">
+                
+                <img src="{{ asset('assets/student.png') }}" alt="student" class="tabicon">
             </label>
 
             <input type="radio" name="customer_type" id="caller-parent" value="parent" hidden>
             <label for="caller-parent">
                 <span>Parent</span>
-                <img src="assets/parent.png" alt="parent" class="tabicon">
+                <img src="{{ asset('assets/parent.png') }}" alt="parent" class="tabicon">
             </label>
 
             <input type="radio" name="customer_type" id="caller-staff" value="staff" hidden>
             <label for="caller-staff">
                 <span>Staff</span>
-                <img src="assets/staff.png" alt="staff" class="tabicon">
+                <img src="{{ asset('assets/staff.png') }}" alt="staff" class="tabicon">
             </label>
 
             <input type="radio" name="customer_type" id="caller-general" value="general" hidden>
             <label for="caller-general">
                 <span>General</span>
-                <img src="assets/general.png" alt="general" class="tabicon">
+                <img src="{{ asset('assets/general.png') }}" alt="general" class="tabicon">
             </label>
         </div>
     </div>
