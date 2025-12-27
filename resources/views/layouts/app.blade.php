@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/login.css">
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
     <style>
 
     </style>
@@ -103,7 +103,7 @@
 
     <!-- Decorative Images -->
     <img src="{{ asset('assets/bottomleft.svg') }}" class="bottom-left" alt="bottomleft" draggable="false">
-    <img src="{{ asset('assets/topright.svg') }}" class="top-right" alt="topright" draggable="false">
+    <img src="{{ asset('public/assets/topright.svg') }}" class="top-right" alt="topright" draggable="false">
 
     <!-- User Profile Dropdown -->
     <div class="profile">
