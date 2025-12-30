@@ -120,63 +120,72 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
     let chartAll, chartCompleted, chartResolved, chartScheduled;
+function toNumber(val) {
+    return Number(val) || 0;
+}
+function renderCharts(users) {
 
-    function renderCharts(users) {
-        if (chartAll) chartAll.destroy();
-        if (chartCompleted) chartCompleted.destroy();
-        if (chartScheduled) chartScheduled.destroy();
-        if (chartResolved) chartResolved.destroy();
-        chartAll = new Chart(ctxAll, {
-            type: 'doughnut',
-            data: {
-                labels: users.map(u => u.name),
-                datasets: [{
-                    data: users.map(u => parseInt(u.Received_Calls)),
-                    backgroundColor: colors
-                }]
-            },
-            options: chartOptions,
-            plugins: [ChartDataLabels]
-        });
+    if (chartAll) chartAll.destroy();
+    if (chartCompleted) chartCompleted.destroy();
+    if (chartScheduled) chartScheduled.destroy();
+    if (chartResolved) chartResolved.destroy();
 
-        chartCompleted = new Chart(ctxReceived, {
-            type: 'doughnut',
-            data: {
-                labels: users.map(u => u.name),
-                datasets: [{
-                    data: users.map(u => parseInt(u.Submitted)),
-                    backgroundColor: colors
-                }]
-            },
-            options: chartOptions,
-            plugins: [ChartDataLabels]
-        });
-        // pi chart for In_Progress
-        chartScheduled = new Chart(ctxSolved, {
-            type: 'doughnut',
-            data: {
-                labels: users.map(u => u.name),
-                datasets: [{
-                    data: users.map(u => parseInt(u.Escalated)),
-                    backgroundColor: colors
-                }]
-            },
-            options: chartOptions,
-            plugins: [ChartDataLabels]
-        });
-        chartResolved = new Chart(ctxResolved, {
-            type: 'doughnut',
-            data: {
-                labels: users.map(u => u.name),
-                datasets: [{
-                    data: users.map(u => parseInt(u.Resolved)),
-                    backgroundColor: colors
-                }]
-            },
-            options: chartOptions,
-            plugins: [ChartDataLabels]
-        });
-    }
+    const labels = users.map(u => u.name);
+
+    chartAll = new Chart(ctxAll, {
+        type: 'doughnut',
+        data: {
+            labels,
+            datasets: [{
+                data: users.map(u => toNumber(u.Received_Calls)),
+                backgroundColor: colors
+            }]
+        },
+        options: chartOptions,
+        plugins: [ChartDataLabels]
+    });
+
+    chartCompleted = new Chart(ctxReceived, {
+        type: 'doughnut',
+        data: {
+            labels,
+            datasets: [{
+                data: users.map(u => toNumber(u.Submitted)),
+                backgroundColor: colors
+            }]
+        },
+        options: chartOptions,
+        plugins: [ChartDataLabels]
+    });
+
+    chartScheduled = new Chart(ctxSolved, {
+        type: 'doughnut',
+        data: {
+            labels,
+            datasets: [{
+                data: users.map(u => toNumber(u.Escalated)),
+                backgroundColor: colors
+            }]
+        },
+        options: chartOptions,
+        plugins: [ChartDataLabels]
+    });
+
+    chartResolved = new Chart(ctxResolved, {
+        type: 'doughnut',
+        data: {
+            labels,
+            datasets: [{
+                data: users.map(u => toNumber(u.Resolved)),
+                backgroundColor: colors
+            }]
+        },
+        options: chartOptions,
+        plugins: [ChartDataLabels]
+    });
+}
+
+
 
     function loadReport() {
         let period = periodSelect.value;
