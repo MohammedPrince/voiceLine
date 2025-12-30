@@ -234,7 +234,7 @@ class StudentController extends Controller
 
             $clearance = DB::connection('mysql_sis2')
                 ->table('stud_course_mark as t')
-                ->join('course_desc as c', 't.course_code', '=', 'c.course_code') // join مع course_desc
+                ->join('course_details as c', 't.course_code', '=', 'c.course_code') // join مع course_details
                 ->join('student_profile_common as spc', function ($join) {
                     $join->on('t.stud_id', '=', 'spc.stud_id')
                         ->on('t.batch', '=', 'spc.batch'); // 👈 إضافة شرط batch
@@ -247,7 +247,7 @@ class StudentController extends Controller
                     't.stud_id',
                     'spc.batch',          // batch من student_profile_common
                     't.course_code',
-                    'c.course_name',      // اسم الكورس من course_desc
+                    'c.course_name',      // اسم الكورس من course_details
                     't.semester',
                     DB::raw("CONCAT(
             t.grade,
