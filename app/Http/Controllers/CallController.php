@@ -150,7 +150,8 @@ $ticket=null;
 
         public function store(Request $request)
     {
-        $validated = $request->validate([
+        try{
+ $validated = $request->validate([
      /*       'ticket_number'      => 'nullable|string|max:25',
             'customer_type'      => 'required|in:student,parent,staff,external',
             'stud_id'        => 'nullable|integer',
@@ -167,7 +168,7 @@ $ticket=null;
         'ticket_number'=> $request->input('ticket_number' ?? 'UNKNOWN'),
         'category'           => $request->input('category'),
         'issue'        => $request->input('issue'),
-         'Solution_Note'        => $request->input('Solution_Note'),
+        'Solution_Note'        => $request->input('Solution_Note'),
         'Found_Status'        => $request->input('Found_Status'),
         'Final_Status'        => $request->input('Final_Status'),
         'priority'           => $request->input('priority') ?? 'medium',
@@ -179,6 +180,13 @@ $ticket=null;
         ]);
 // dd($request);
         return redirect()->back()->with('success', 'Voice Call saved successfully!');
+   } catch (\Illuminate\Database\QueryException $e) {
+        return redirect()->back()
+            ->withInput()
+            ->with('exact_error', 'Database Error: ' . $e->getMessage());
+    } catch (\Exception $e) {
+        return redirect()->back()
+            ->withInput()
+            ->with('exact_error', 'System Error: ' . $e->getMessage());
     }
- 
-}
+}}

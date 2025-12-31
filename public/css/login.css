@@ -475,7 +475,13 @@ p b {
   background-color: #ec8305;
   transform: translateY(-4px);
 }
-
+.submit-btn:focus, 
+.submit-btn:active, 
+.submit-btn:focus-visible {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none; /* Removes the default inner shadow browsers add on click */
+}
 .view-btn {
   padding: 8px;
   border: none;

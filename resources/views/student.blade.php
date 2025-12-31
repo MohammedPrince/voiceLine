@@ -4,7 +4,7 @@
 
 @section('content')
 
-
+<div id="mainAlert" class="alert alert-danger d-none" role="alert"></div>
 
 <form action="{{ route('voicecalls.store') }}" method="POST">
     @csrf
@@ -14,8 +14,40 @@
         {{ session('success') }}
     </div>
     @endif
+@if(session('exact_error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-left: 5px solid #842029;">
+        <div class="d-flex">
+            <div class="py-1">
+                <svg class="h-6 w-6 text-danger me-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" style="width:24px; fill:currentColor;">
+                    <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm1.41-1.41A8 8 0 1 0 15.66 4.34 8 8 0 0 0 4.34 15.66zm9.54-7.37A1 1 0 1 1 12.47 9.7l-2.47-2.48-2.47 2.48A1 1 0 1 1 6.12 8.29l2.47-2.48-2.47-2.47a1 1 0 1 1 1.41-1.42l2.47 2.47 2.47-2.47a1 1 0 0 1 1.41 1.42L11.06 7.22l2.47 2.48z"/>
+                </svg>
+            </div>
+            <div class="w-100">
+                <p class="fw-bold mb-1">Submission Failed</p>
+                <p class="mb-2">Please make sure all required fields are filled correctly.</p>
+                
+                <button id="toggleErrorBtn" 
+                        class="btn btn-sm btn-outline-danger" 
+                        type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#errorDetails"
+                        onclick="this.remove()">
+                    Show More Details
+                </button>
 
-
+                <div class="collapse mt-3" id="errorDetails">
+                    <div class="card card-body bg-light border-0 p-2">
+                        <small class="text-muted mb-1 fw-bold">Technical Error:</small>
+                        <code id="errorMsg" style="color: #842029; font-size: 0.75rem; word-break: break-all;">
+                            {{ session('exact_error') }}
+                        </code>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
     <div class="field caller-tabs"
         style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; margin-bottom: 80px;">
 
@@ -66,8 +98,7 @@
                 </div>
             </div>
             <div style="flex: 1 1 25%;">
-                <button type="button" data-bs-target="#StatusModal" data-bs-toggle="modal" id="btngetstdrecord"
-                    class="view-btn">
+                <button type="button" id="btngetstdrecord"  class="view-btn">
                     View Status
                 </button>
 
@@ -267,12 +298,40 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" style="padding: 20px;">
-                <p><b>Name:</b> <span id="studentName"> {{ session('name') }} </span></p>
+<div id="modalAlert" class="alert alert-danger d-none" role="alert"></div>
+<div id="statusLoader" class="text-center my-4">
+
+    <div class="spinner-border text-warning" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading student data...</p>
+</div>
+
+
+<div id="statusContent" style="display:none;">
+    
+
+       <p><b>Name:</b> <span id="studentName"> {{ session('name') }} </span></p>
                 <p><b>Major:</b> <span id="studentMajor"> {{ session('name') }}</span></p>
                 <p><b>Batch:</b> <span id="studentBatch"> {{ session('batch') }}</span></p>
                 <p><b>Semester:</b> <span id="studentSemester"> {{ session('semester') }}</span></p>
-                <p><b>Status:</b> <span id="studentStatus"> {{ session('status') }}</span></p>
 
+<p>
+    <!-- <b>GPA:</b>
+    <span id="studentGpa">{{ session('gpa') }}</span>
+    &nbsp; | &nbsp; -->
+
+    <b>CGPA:</b>
+    <span id="studentCgpa">{{ session('last_cgpa') }}</span>
+    &nbsp; | &nbsp;
+
+    <b>Status:</b>
+    <span id="studentStatus">{{ session('status') }}</span>
+</p>
+
+
+                <!-- <p><b>Status:</b> <span id="studentStatus"> {{ session('status') }}</span></p> -->
+ 
                 <!-- Subjects Table -->
                 <div class="row mb-2">
                     <div class="col-12 mb-2">
@@ -322,6 +381,10 @@
                     </div>
                 </div>
 
+</div>
+
+
+           
                 @endsection
                 @push('scripts')
                 <!-- Bootstrap JS -->
@@ -329,6 +392,56 @@
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
                 <!-- Toggle Logic in JS -->
                 <script>
+
+
+// custom alert dialog
+
+
+function showAlert(message, type = 'danger', targetId = 'mainAlert') {
+    const alertBox = document.getElementById(targetId);
+
+    if (alertBox) {
+        alertBox.className = `alert alert-${type}`;
+        alertBox.textContent = message;
+        alertBox.classList.remove('d-none');
+
+        // Only auto-hide if it is NOT the modal alert
+        if (targetId !== 'modalAlert') {
+            setTimeout(() => {
+                alertBox.classList.add('d-none');
+            }, 3000);
+        } 
+    }
+}
+
+// view status error handling code 
+document.getElementById('btngetstdrecord').addEventListener('click', function() {
+    const studentId = document.getElementById('indexInput').value;
+    const ticketno = document.getElementById('ticketno').value;
+
+    // Check for empty inputs first
+    if ((!studentId || studentId.trim() === "") && (!ticketno || ticketno.trim() === "")) {
+        // Case: Everything is empty - DON'T show modal
+        showAlert("Please enter Student ID", "warning" , "mainAlert");
+        return; // Stop here
+    }
+
+    // If we have data, manually show the modal and start the fetch
+    const modalEl = document.getElementById('StatusModal');
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+
+    // Now handle the logic as before
+    if ((!studentId || studentId.trim() === "") && ticketno) {
+        get_ticket_records(ticketno);
+    } else {
+        getStudentRecord(studentId);
+    }
+});
+
+
+
+
                 const radios = document.querySelectorAll('input[name="customer_type"]');
                 const fields = {
                     parent: document.getElementById("parent-field"),
@@ -415,6 +528,8 @@
 
                         console.log(studentId);
                         console.log(ticketno);
+           
+                        document.getElementById('modalAlert').classList.add('d-none');
                         if ((!studentId || studentId.trim() === "") && ticketno && ticketno.length > 0) {
                             // Case 1: studentId is null/empty AND ticketId exists
                             console.log('ticketno');
@@ -424,14 +539,17 @@
 
                             getStudentRecord(studentId);
                         } else {
-                            // Case 3: neither provided
-                            alert("Please enter Std Id or TicketID");
+                            // // Case 3: neither provided
+                            // showAlert("Please enter Std Id or TicketID","warning");
                         }
 
                     }
                 );
 
                 function getStudentRecord(studentId) {
+                       // SHOW loader
+                       document.getElementById('statusLoader').style.display = 'block';
+                        document.getElementById('statusContent').style.display = 'none';
                     console.log("Fetching student data:", `/get-student/${studentId}`);
 
                     fetch(`{{ url('/get-student') }}/${studentId}`)
@@ -441,10 +559,14 @@
                         })
                         .then(data => {
                             if (!data.success) {
-                                alert(data.message || 'Error loading student data');
+
+                                showAlert(data.message || 'Error loading student data','modalAlert');
                                 return;
                             }
 
+                           //  HIDE loader, SHOW content
+                            document.getElementById('statusLoader').style.display = 'none';
+                            document.getElementById('statusContent').style.display = 'block';
                             // ✅ Fill the form fields
                             document.getElementById('stud_id').innerText = data.student.stud_id || '';
                             document.getElementById('stdindexno').value = data.student.stud_id || '';
@@ -459,6 +581,7 @@
                             document.getElementById('studentBatch').textContent = data.student.batch || 'N/A';
                             document.getElementById('studentSemester').textContent = data.student.semester || 'N/A';
                             document.getElementById('studentStatus').textContent = data.student.status || 'N/A';
+                            document.getElementById('studentCgpa').textContent = data.student.last_cgpa || 'N/A';
 
                             // ✅ Clear old tickets
                             const ticketsTable = document.getElementById('ticketsTable');
@@ -507,8 +630,10 @@
                         })
 
                         .catch(error => {
+                             document.getElementById('statusLoader').style.display = 'none';
                             console.error('Error:', error);
-                            alert('Error loading student data: ' + error.message);
+                           
+                            showAlert('Error loading student data: ' + error.message, 'danger', 'modalAlert');
                         });
                 }
 
@@ -522,7 +647,7 @@
                         })
                         .then(data => {
                             if (!data.success) {
-                                alert("لم يتم العثور على بيانات التذكرة");
+                                showAlert("لم يتم العثور على بيانات التذكرة");
                                 return;
                             }
 
@@ -544,7 +669,7 @@
                         })
                         .catch(error => {
                             console.error("Error fetching ticket data:", error);
-                            alert("حصل خطأ أثناء تحميل بيانات التذكرة: " + error.message);
+                            showAlert("حصل خطأ أثناء تحميل بيانات التذكرة: " + error.message);
                         });
 
                 }
