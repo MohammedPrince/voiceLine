@@ -51,9 +51,15 @@
         </div>
 
         <div class="col-md-3">
-            <label class="form-label">Parent Name</label>
-            <input type="text" name="parent_name" class="form-control" placeholder="Enter parent name">
+            <label class="form-label">Name</label>
+            <input type="text" name="parent_name" class="form-control" placeholder="Enter name">
         </div>
+
+ <div class="col-md-3">
+            <label class="form-label">Student ID</label>
+            <input type="text" name="stud_id" class="form-control" placeholder="Enter student ID">
+        </div>
+
 
         <div class="col-md-3">
             <label class="form-label">Staff ID</label>
@@ -62,7 +68,54 @@
 
         <div class="col-md-3">
             <label class="form-label">Category</label>
-            <input type="text" name="category" class="form-control" placeholder="Enter category">
+ <select id="category" name="category">
+    <option value="" selected></option>
+
+    <!-- Certificates -->
+    <option value="1">[Certificates] Graduates Lists</option>
+    <option value="2">[Certificates] Delayed Issuance</option>
+    <option value="3">[Certificates] Payment Issues</option>
+    <option value="4">[Certificates] General</option>
+
+    <!-- Finance -->
+    <option value="5">[Finance] Delayed Approval</option>
+
+    <!-- Academic -->
+    <option value="6">[Academic] Delayed Approval</option>
+    <option value="7">[Academic] Delayed Result</option>
+    <option value="8">[Academic] Registration</option>
+    <option value="9">[Academic] Verification</option>
+    <option value="10">[Academic] F/z result</option>
+    <option value="11">[Academic] Postgraduate</option>
+    <option value="12">[Academic] remarking</option>
+
+    <!-- E-Learning -->
+    <option value="13">[E-Learning] Account Activation</option>
+    <option value="14">[E-Learning] F/Z Course Enrolment</option>
+    <option value="15">[E-Learning] Wrong Courses</option>
+
+    <!-- HelpDesk -->
+    <option value="16">[HelpDesk] Password Reset</option>
+
+    <!-- General Inquiry -->
+    <option value="17">[General Inquiry] New Admission</option>
+    <option value="18">[General Inquiry] General</option>
+    <option value="19">[General inquiry] others</option>
+    <option value="20">[General inquiry] Complaint</option>
+
+    <!-- Addmission -->
+    <option value="21">[Addmission] Internal/external transfer/تجسير</option>
+
+    <!-- CTS -->
+    <option value="22">[CTS] SMOWL issues</option>
+    <option value="23">[CTS] Exam Access</option>
+    <option value="24">[CTS] Close ticket /OPEN</option>
+
+    <!-- CESD -->
+    <option value="25">[CESD] Index issuing</option>
+</select>
+
+
         </div>
 <div class="col-12 d-flex justify-content-center gap-2">
     <button type="button" id="filterBtn"
@@ -116,6 +169,99 @@
       </div>
     </div>
   </div>
+</div>
+<div class="modal fade" id="StatusModal" tabindex="-1" aria-labelledby="StatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="StatusModalLabel" style="color: #EC8305;">Student Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+<div id="modalAlert" class="alert alert-danger d-none" role="alert"></div>
+<div id="statusLoader" class="text-center my-4">
+
+    <div class="spinner-border text-warning" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading student data...</p>
+</div>
+
+
+<div id="statusContent" style="display:none;">
+    
+
+       <p><b>Name:</b> <span id="studentName"> {{ session('name') }} </span></p>
+                <p><b>Major:</b> <span id="studentMajor"> {{ session('name') }}</span></p>
+                <p><b>Batch:</b> <span id="studentBatch"> {{ session('batch') }}</span></p>
+                <p><b>Semester:</b> <span id="studentSemester"> {{ session('semester') }}</span></p>
+
+<p>
+    <!-- <b>GPA:</b>
+    <span id="studentGpa">{{ session('gpa') }}</span>
+    &nbsp; | &nbsp; -->
+
+    <b>CGPA:</b>
+    <span id="studentCgpa">{{ session('last_cgpa') }}</span>
+    &nbsp; | &nbsp;
+
+    <b>Status:</b>
+    <span id="studentStatus">{{ session('status') }}</span>
+</p>
+
+
+                <!-- <p><b>Status:</b> <span id="studentStatus"> {{ session('status') }}</span></p> -->
+ 
+                <!-- Subjects Table -->
+                <div class="row mb-2">
+                    <div class="col-12 mb-2">
+                        <p><b>F/Z/I Subjects:</b></p>
+                    </div>
+                    <div class="col-12">
+                        <table class="table table-bordered table-sm align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="color: #EC8305;">Sem</th>
+                                      <th style="color: #EC8305;">Subject Code</th>
+                                    <th style="color: #EC8305;">Course Name</th>
+                                    <th style="color: #EC8305;">Grade</th>
+                                    <th style="color: #EC8305;">Remark</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentSubjectsTable">
+                                <tr>
+                                    <td colspan="4" class="text-center">No data available</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Subjects Table -->
+                <div class="row mb-2">
+                    <div class="col-12 mb-2">
+                        <p><b>Tickets:</b></p>
+                    </div>
+                    <div class="col-12">
+                        <table class="table table-bordered table-sm align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="color: #EC8305;">Ticket ID</th>
+                                    <th style="color: #EC8305;">Ticket Subject</th>
+                                    <th style="color: #EC8305;">URL</th>
+                                    <th style="color: #EC8305;">Get</th>
+                                    <th style="color: #EC8305;">Remark</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ticketsTable">
+                                <tr>
+                                    <td colspan="4" class="text-center">No data available</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
 </div>
 
 <!-- <script>
@@ -320,23 +466,32 @@ function openStudentModal(studentId) {
             document.getElementById('studentCgpa').textContent = data.student.last_cgpa || 'N/A';
 
             // Populate subjects table
-            const subjectsTable = document.getElementById('studentSubjectsTable');
-            subjectsTable.innerHTML = '';
-            if (data.clearance && data.clearance.length > 0) {
-                data.clearance.forEach(row => {
-                    const tr = `
-                        <tr>
-                            <td>${row.semester || ''}</td>
-                            <td>${row.course_name || ''}</td>
-                            <td>${row.clearance_grade || ''}</td>
-                            <td>${row.remark || ''}</td>
-                        </tr>`;
-                    subjectsTable.insertAdjacentHTML('beforeend', tr);
-                });
-            } else {
-                subjectsTable.innerHTML = `<tr><td colspan="4" class="text-center">No data available</td></tr>`;
-            }
+    // Populate subjects table
+// Populate subjects table
+const subjectsTable = document.getElementById('studentSubjectsTable');
+subjectsTable.innerHTML = '';
 
+if (data.clearance && data.clearance.length > 0) {
+    const seenSubjectCodes = new Set();
+
+    data.clearance.forEach(row => {
+        if (!seenSubjectCodes.has(row.course_code)) {  // Use the correct property for subject code
+            seenSubjectCodes.add(row.course_code);
+
+            const tr = `
+                <tr>
+                    <td>${row.semester || ''}</td>
+                    <td>${row.course_code || ''}</td>  <!-- Subject code cell -->
+                    <td>${row.course_name || ''}</td>
+                    <td>${row.clearance_grade || ''}</td>
+                    <td>${row.remark || ''}</td>
+                </tr>`;
+            subjectsTable.insertAdjacentHTML('beforeend', tr);
+        }
+    });
+} else {
+    subjectsTable.innerHTML = `<tr><td colspan="5" class="text-center">No data available</td></tr>`;
+}
             // Populate tickets table
             const ticketsTable = document.getElementById('ticketsTable');
             ticketsTable.innerHTML = '';

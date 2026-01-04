@@ -174,28 +174,52 @@
         <div class="field">
             <div class="label">Category</div>
 <select id="category" name="category">
-        <option value="" selected></option>
+    <option value="" selected></option>
 
-        <option value="1">[Certificates] Graduates Lists</option>
-        <option value="2">[Certificates] Delayed Issuance</option>
-        <option value="3">[Certificates] Payment Issues</option>
+    <!-- Certificates -->
+    <option value="1">[Certificates] Graduates Lists</option>
+    <option value="2">[Certificates] Delayed Issuance</option>
+    <option value="3">[Certificates] Payment Issues</option>
+    <option value="4">[Certificates] General</option>
 
-        <option value="4">[Finance] Delayed Approval</option>
+    <!-- Finance -->
+    <option value="5">[Finance] Delayed Approval</option>
 
-        <option value="5">[Academic] Delayed Approval</option>
-        <option value="6">[Academic] Delayed Result</option>
-        <option value="7">[Academic] Registration</option>
-        <option value="8">[Academic] Verification</option>
+    <!-- Academic -->
+    <option value="6">[Academic] Delayed Approval</option>
+    <option value="7">[Academic] Delayed Result</option>
+    <option value="8">[Academic] Registration</option>
+    <option value="9">[Academic] Verification</option>
+    <option value="10">[Academic] F/z result</option>
+    <option value="11">[Academic] Postgraduate</option>
+    <option value="12">[Academic] remarking</option>
 
-        <option value="9">[E-Learning] Account Activation</option>
-        <option value="10">[E-Learning] F/Z Course Enrolment</option>
-        <option value="11">[E-Learning] Wrong Courses</option>
+    <!-- E-Learning -->
+    <option value="13">[E-Learning] Account Activation</option>
+    <option value="14">[E-Learning] F/Z Course Enrolment</option>
+    <option value="15">[E-Learning] Wrong Courses</option>
 
-        <option value="12">[HelpDesk] Password Reset</option>
+    <!-- HelpDesk -->
+    <option value="16">[HelpDesk] Password Reset</option>
 
-        <option value="13">[General Inquiry] New Admission</option>
-        <option value="14">[General Inquiry] General</option>
-    </select>
+    <!-- General Inquiry -->
+    <option value="17">[General Inquiry] New Admission</option>
+    <option value="18">[General Inquiry] General</option>
+    <option value="19">[General inquiry] others</option>
+    <option value="20">[General inquiry] Complaint</option>
+
+    <!-- Addmission -->
+    <option value="21">[Addmission] Internal/external transfer/تجسير</option>
+
+    <!-- CTS -->
+    <option value="22">[CTS] SMOWL issues</option>
+    <option value="23">[CTS] Exam Access</option>
+    <option value="24">[CTS] Close ticket /OPEN</option>
+
+    <!-- CESD -->
+    <option value="25">[CESD] Index issuing</option>
+</select>
+
 
         </div>
         <div id="ticket-fields-group">
@@ -270,7 +294,7 @@
                                     <th style="color: #EC8305;">Ticket Subject</th>
                                     <th style="color: #EC8305;">URL</th>
                                     <th style="color: #EC8305;">Get</th>
-                                    <th style="color: #EC8305;">Remark</th>
+                                    <th style="color: #EC8305;">Priorety</th>
                                 </tr>
                             </thead>
                             <tbody id="staffTicketsTable">
@@ -286,7 +310,7 @@
     </div>
 </div>
 
-<!----------------------------------------- student Modal ------------------------------>
+<!----------------------------------------- student Modal --------->
 <div class="modal fade" id="StatusModal" tabindex="-1" aria-labelledby="StatusModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -339,7 +363,8 @@
                             <thead class="table-light">
                                 <tr>
                                     <th style="color: #EC8305;">Sem</th>
-                                    <th style="color: #EC8305;">Course</th>
+                                    <th style="color: #EC8305;">Subject Code</th>
+                                    <th style="color: #EC8305;">Course Name</th>
                                     <th style="color: #EC8305;">Grade</th>
                                     <th style="color: #EC8305;">Remark</th>
                                 </tr>
@@ -579,7 +604,7 @@ document.getElementById('btngetstdrecord').addEventListener('click', function() 
                             document.getElementById('studentSemester').textContent = data.student.semester || 'N/A';
                             document.getElementById('studentStatus').textContent = data.student.status || 'N/A';
                             document.getElementById('studentCgpa').textContent = data.student.last_cgpa || 'N/A';
-
+ console.log('Tickets data:', data.tickets);
                             // ✅ Clear old tickets
                             const ticketsTable = document.getElementById('ticketsTable');
                             ticketsTable.innerHTML = "";
@@ -604,24 +629,32 @@ document.getElementById('btngetstdrecord').addEventListener('click', function() 
                                     `<tr><td colspan="4" class="text-center">No tickets found</td></tr>`;
                             }
                             // ✅ تفريغ الجدول قبل التحديث
-                            const subjectsTable = document.getElementById('studentSubjectsTable');
-                            subjectsTable.innerHTML = "";
+                      // Populate subjects table
+const subjectsTable = document.getElementById('studentSubjectsTable');
+subjectsTable.innerHTML = '';
 
-                            if (data.clearance && data.clearance.length > 0) {
-                                data.clearance.forEach(row => {
-                                    const tr = `
-            <tr>
-                <td>${row.semester || ''}</td>
-                <td>${row.course_name || ''}</td>
-                <td>${row.clearance_grade || ''}</td>
-                <td>${row.remark || ''}</td>
-            </tr>`;
-                                    subjectsTable.insertAdjacentHTML('beforeend', tr);
-                                });
-                            } else {
-                                subjectsTable.innerHTML =
-                                    `<tr><td colspan="4" class="text-center">No data available</td></tr>`;
-                            }
+if (data.clearance && data.clearance.length > 0) {
+    const seenSubjectCodes = new Set();
+
+    data.clearance.forEach(row => {
+        if (!seenSubjectCodes.has(row.course_code)) {  // Use the correct property for subject code
+            seenSubjectCodes.add(row.course_code);
+
+            const tr = `
+                <tr>
+                    <td>${row.semester || ''}</td>
+                    <td>${row.course_code || ''}</td>  <!-- Subject code cell -->
+                    <td>${row.course_name || ''}</td>
+                    <td>${row.clearance_grade || ''}</td>
+                    <td>${row.remark || ''}</td>
+                </tr>`;
+            subjectsTable.insertAdjacentHTML('beforeend', tr);
+        }
+    });
+} else {
+    subjectsTable.innerHTML = `<tr><td colspan="5" class="text-center">No data available</td></tr>`;
+}
+
 
 
                         })
@@ -643,11 +676,14 @@ document.getElementById('btngetstdrecord').addEventListener('click', function() 
                             return response.json();
                         })
                         .then(data => {
+                         
+
                             if (!data.success) {
                                 showAlert("لم يتم العثور على بيانات التذكرة");
+
                                 return;
                             }
-
+  
                             const ticket = data.ticket;
 
                             document.getElementById('ticketNumber').value = ticket.trackid || '';

@@ -76,24 +76,37 @@ private function getCategoriesMap()
     "1"  => "[Certificates] Graduates Lists",
     "2"  => "[Certificates] Delayed Issuance",
     "3"  => "[Certificates] Payment Issues",
+    "4"  => "[Certificates] General",
 
-    "4"  => "[Finance] Delayed Approval",
+    "5"  => "[Finance] Delayed Approval",
 
-    "5"  => "[Academic] Delayed Approval",
-    "6"  => "[Academic] Delayed Result",
-    "7"  => "[Academic] Registration",
-    "8"  => "[Academic] Verification",
+    "6"  => "[Academic] Delayed Approval",
+    "7"  => "[Academic] Delayed Result",
+    "8"  => "[Academic] Registration",
+    "9"  => "[Academic] Verification",
+    "10" => "[Academic] F/z result",
+    "11" => "[Academic] Postgraduate",
+    "12" => "[Academic] remarking",
 
-    "9"  => "[E-Learning] Account Activation",
-    "10" => "[E-Learning] F/Z Course Enrolment",
-    "11" => "[E-Learning] Wrong Courses",
+    "13" => "[E-Learning] Account Activation",
+    "14" => "[E-Learning] F/Z Course Enrolment",
+    "15" => "[E-Learning] Wrong Courses",
 
-    "12" => "[HelpDesk] Password Reset",
+    "16" => "[HelpDesk] Password Reset",
 
-    "13" => "[General Inquiry] New Admission",
-    "14" => "[General Inquiry] General",
+    "17" => "[General Inquiry] New Admission",
+    "18" => "[General Inquiry] General",
+    "19" => "[General inquiry] others",
+    "20" => "[General inquiry] Complaint",
+
+    "21" => "[Addmission] Internal/external transfer/تجسير",
+
+    "22" => "[CTS] SMOWL issues",
+    "23" => "[CTS] Exam Access",
+    "24" => "[CTS] Close ticket /OPEN",
+
+    "25" => "[CESD] Index issuing",
 ];
-
 }
  
 

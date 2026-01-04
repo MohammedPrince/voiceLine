@@ -164,7 +164,7 @@ $ticket=null;
         ]); 
         $voiceCall = VoiceCall::create([
         'customer_type'      => $request->input('customer_type'),
-        'stud_id'        => $request->input('stdindexno'||'stud_id'),
+       'stud_id' => $request->input('stdindexno') ?: $request->input('stud_index'),
         'ticket_number'=> $request->input('ticket_number' ?? 'UNKNOWN'),
         'category'           => $request->input('category'),
         'issue'        => $request->input('issue'),

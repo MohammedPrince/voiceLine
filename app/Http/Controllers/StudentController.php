@@ -293,10 +293,10 @@ class StudentController extends Controller
             $tickets = DB::connection('mysql_Hdesk')->table('hesk_tickets')
                 ->where('custom1', $student->stud_id)
                 ->select('trackid', 'subject', 'status as status_code', DB::raw("CASE 
-                    WHEN priority = 1 THEN 'Normal'
-                    WHEN priority = 2 THEN 'Middle' 
-                    WHEN priority = 3 THEN 'High'
-                    WHEN priority = 4 THEN 'Critical'
+                    WHEN priority = 3 THEN 'Low'
+                    WHEN priority = 2 THEN 'Medium' 
+                    WHEN priority = 1 THEN 'High'
+                    WHEN priority = 0 THEN 'Critical'
                     ELSE 'Unknown'
                 END as priority"), 'priority as priority_code', DB::raw("CASE 
                     WHEN status = 1 THEN 'CUSTOMER REPLIED'
@@ -381,10 +381,10 @@ class StudentController extends Controller
                     't.owner',
                     DB::raw("COALESCE(u.name, 'Unassigned') as owner_name"),
                     DB::raw("CASE 
-            WHEN t.priority = 1 THEN 'Normal'
-            WHEN t.priority = 2 THEN 'Middle' 
-            WHEN t.priority = 3 THEN 'High'
-            WHEN t.priority = 4 THEN 'Critical'
+                    WHEN priority = 3 THEN 'Low'
+                    WHEN priority = 2 THEN 'Medium' 
+                    WHEN priority = 1 THEN 'High'
+                    WHEN priority = 0 THEN 'Critical'
             ELSE 'Unknown'
         END as priority"),
                     DB::raw("CASE 
