@@ -88,7 +88,7 @@
     });
 
     function loadReport(params = {}) {
-      let url = "/reports/data";
+    let url = "/report-data";
       const query = new URLSearchParams(params).toString();
       if (query) url += "?" + query;
 

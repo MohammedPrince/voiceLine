@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Cookie;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -27,6 +28,16 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+ //  Remember username (email)
+    if ($request->has('remember_username')) {
+        Cookie::queue(
+            'remembered_username',
+            $request->email,
+            60 * 24 * 30 // 30 days
+        );
+    } else {
+        Cookie::queue(Cookie::forget('remembered_username'));
+    }
 
         return redirect()->intended(route('dashboard', absolute: false));
     }

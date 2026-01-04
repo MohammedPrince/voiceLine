@@ -52,7 +52,7 @@
   <!-- Form Container -->
   <div class="container col-12" style="flex-direction: row;">
     <div class="row g-0 col-12">
-      <div class="left-form col-4 align-content-center">
+      <div class="left-form col-12 col-md-5 col-lg-4 align-content-center">
         
         <!-- Session Status -->
         <x-auth-session-status class="mb-4" :status="session('status')" />
@@ -74,7 +74,7 @@
           <label for="email" class="form-label"
             style="color: #B77848;user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;"
             data-i18n="username">Username</label>
-          <input type="email" class="form-control form-control-sm" id="email" name="email" value="{{ old('email') }}" required autofocus>
+          <input type="email" class="form-control form-control-sm" id="email" name="email" value="{{ old('email', request()->cookie('remembered_username')) }}" required autofocus>
           @error('email')
             <div class="text-danger mt-1">{{ $message }}</div>
           @enderror
@@ -94,13 +94,15 @@
 
           <!-- Remember Me -->
           <div class="form-check mt-2">
-            <input class="form-check-input small" type="checkbox" id="remember_me" name="remember">
+            <input class="form-check-input small" type="checkbox"  id="remember_username"
+  name="remember_username"
+  {{ request()->cookie('remembered_username') ? 'checked' : '' }}>
             <label class="form-check-label" for="remember_me" data-i18n="remember">
               Remember my username
             </label>
           </div>
 
-          <button type="submit" class="btn btn-outline mt-3" data-i18n="login" style="width: 220px;margin-top: 10px;">Login</button>
+          <button type="submit" class="btn btn-outline mt-3 w-100 w-md-auto" data-i18n="login" style="margin-top: 10px;">Login</button>
         </form>
       </div>
 

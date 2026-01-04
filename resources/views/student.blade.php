@@ -209,7 +209,7 @@
                 </div>
 
                 <div class="field">
-                    <div class="label">Ticket URL</div>
+                    <div class="label">Ticket Subject</div>
                     <input type="text" id="ticketURL" name="ticket_url" class="form-control" readonly>
                 </div>
 

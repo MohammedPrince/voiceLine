@@ -11,15 +11,17 @@ use Carbon\Carbon;
 
 class ReportController extends Controller
 {
+    
     public function getReportData(Request $request)
     {
-         $query = DB::table('voice_calls')
-            ->join('category', 'voice_calls.category', '=', 'category.id') // الربط مع جدول category
-            ->select(
-                'category.name as category', 
-                DB::raw('COUNT(voice_calls.call_id) as total')
-            );
-
+        //  $query = DB::table('voice_calls')
+        //     ->join('category', 'voice_calls.category', '=', 'category.id') // الربط مع جدول category
+        //     ->select(
+        //         'category.name as category', 
+        //         DB::raw('COUNT(voice_calls.call_id) as total')
+        //     );
+$query = DB::table('voice_calls')
+        ->select('category', DB::raw('COUNT(call_id) as total'));
         // فلترة حسب period
         if ($request->filled('period')) {
             $period = $request->period;
@@ -51,13 +53,51 @@ class ReportController extends Controller
         }
 
         // تجميع حسب category
-        $data = $query->groupBy('category.id', 'category.name')->get();
+        // $data = $query->groupBy('category.id', 'category.name')->get();
+$results = $query->groupBy('category')->get();
+// Map the IDs to Names
+    $categoryMap = $this->getCategoriesMap();
 
+    $data = $results->map(function ($item) use ($categoryMap) {
+        return [
+            // If the ID exists in th map, use the name. Otherwise, show the ID.
+            'category' => $categoryMap[$item->category] ?? 'Other/Unknown (' . $item->category . ')',
+            'total' => $item->total
+        ];
+    });
         return response()->json($data);
     }
      
     
-    
+    // Private helper to keep the list organized
+private function getCategoriesMap()
+{
+    return [
+        "1"  => "Data Follow and Verification",
+        "42" => "General Inquiries",
+        "3"  => "Finance",
+        "2"  => "Certificates and Statements",
+        "14" => "E-Learning",
+        "28" => "Update Ministry Graduates List",
+        "16" => "CESD / CTS (Staff only)",
+        "43" => "Human Resources",
+        "24" => "Reports",
+        "23" => "Higher Management",
+        "30" => "External Transfer & Elevation",
+        "31" => "New Admission",
+        "32" => "Faculty of Geoinformatics",
+        "33" => "Fine Arts & Interior Design",
+        "34" => "Faculty of Architecture",
+        "35" => "Telecommunication & Space Tech",
+        "37" => "Information Technology",
+        "38" => "Engineering",
+        "39" => "Computer Sciences",
+        "40" => "Business Administration",
+        "41" => "Postgraduate Studies",
+        "44" => "BetterU Service",
+        "45" => "Technology Horizon Journal",
+    ];
+}
  
 
 
@@ -132,13 +172,14 @@ class ReportController extends Controller
             ->select(
                 'u.name',
                 DB::raw('COUNT(*) AS Received_Calls'),
-                DB::raw("SUM(CASE WHEN v.Final_Status = 'Resolved' THEN 1 ELSE 0 END) AS Resolved"),
-                DB::raw("SUM(CASE WHEN v.Final_Status = 'Escalated' THEN 1 ELSE 0 END) AS Escalated"),
-                DB::raw("SUM(CASE WHEN v.Final_Status = 'Submitted' THEN 1 ELSE 0 END) AS Submitted"),
+                DB::raw("SUM(CASE WHEN v.Final_Status = '" . self::STATUS_RESOLVED . "' THEN 1 ELSE 0 END) AS Resolved"),
+                DB::raw("SUM(CASE WHEN v.Final_Status = '" . self::STATUS_ESCALATED . "' THEN 1 ELSE 0 END) AS Escalated"),
+                DB::raw("SUM(CASE WHEN v.Final_Status = '" . self::STATUS_SUBMITTED . "' THEN 1 ELSE 0 END) AS Submitted"),
               /*  DB::raw("SUM(CASE WHEN v.Final_Status = 'In Progress' THEN 1 ELSE 0 END) AS In_Progress"),
                 DB::raw("SUM(CASE WHEN v.Final_Status = 'Waiting Approval' THEN 1 ELSE 0 END) AS Waiting_Approval"),
                 DB::raw("SUM(CASE WHEN v.Final_Status = 'Under Review' THEN 1 ELSE 0 END) AS Under_Review"),
-                */ DB::raw("SUM(CASE WHEN v.Final_Status IS NULL THEN 1 ELSE 0 END) AS No_data"),
+                */
+                DB::raw("SUM(CASE WHEN v.Final_Status IS NULL THEN 1 ELSE 0 END) AS No_data"),
                 DB::raw("SUM(CASE WHEN v.priority IS NOT NULL AND v.created_at <> v.updated_at THEN 1 ELSE 0 END
                 ) AS Priority_Changed")
            
@@ -149,17 +190,22 @@ class ReportController extends Controller
         // تمرير المتغير للـ view
         return view('reports.dashboard', compact('report'));
     }
+// the numbers stored by the dropdown
+const STATUS_RESOLVED = '1';
+const STATUS_SUBMITTED = '2';
+const STATUS_ESCALATED = '3';
 
-    public function dashboardData(Request $request)
+public function dashboardData(Request $request)
 {
+    
     $query = DB::table('voice_calls as v')
         ->join('users as u', 'u.id', '=', 'v.handled_by_user_id')
         ->select(
             'u.name',
             DB::raw('COUNT(*) AS Received_Calls'),
-                DB::raw("SUM(CASE WHEN v.Final_Status = 'Resolved' THEN 1 ELSE 0 END) AS Resolved"),
-                DB::raw("SUM(CASE WHEN v.Final_Status = 'Escalated' THEN 1 ELSE 0 END) AS Escalated"),
-                DB::raw("SUM(CASE WHEN v.Final_Status = 'Submitted' THEN 1 ELSE 0 END) AS Submitted"),
+             DB::raw("SUM(CASE WHEN v.Final_Status = '" . self::STATUS_RESOLVED . "' THEN 1 ELSE 0 END) AS Resolved"),
+                DB::raw("SUM(CASE WHEN v.Final_Status = '" . self::STATUS_SUBMITTED . "' THEN 1 ELSE 0 END) AS Submitted"),
+                DB::raw("SUM(CASE WHEN v.Final_Status = '" . self::STATUS_ESCALATED . "' THEN 1 ELSE 0 END) AS Escalated"),
               /*  DB::raw("SUM(CASE WHEN v.Final_Status = 'In Progress' THEN 1 ELSE 0 END) AS In_Progress"),
                 DB::raw("SUM(CASE WHEN v.Final_Status = 'Waiting Approval' THEN 1 ELSE 0 END) AS Waiting_Approval"),
                 DB::raw("SUM(CASE WHEN v.Final_Status = 'Under Review' THEN 1 ELSE 0 END) AS Under_Review"),
@@ -182,7 +228,31 @@ class ReportController extends Controller
 
      $report = $query->groupBy('v.handled_by_user_id', 'u.name')->get();
 
-    return response()->json($report);
+   // Rush hour data
+    $rushHourData = DB::table('voice_calls')
+        ->select(DB::raw('HOUR(created_at) as hour'), DB::raw('COUNT(*) as count'))
+        ->when($request->period, function ($q, $period) use ($request) {
+            if ($period == 'week') {
+                $q->where('created_at', '>=', now()->startOfWeek());
+            } elseif ($period == 'month') {
+                $q->where('created_at', '>=', now()->startOfMonth());
+            } elseif ($period == 'last_month') {
+                $q->whereBetween('created_at', [
+                    now()->subMonth()->startOfMonth(),
+                    now()->subMonth()->endOfMonth()
+                ]);
+            } elseif ($period == 'custom' && $request->from && $request->to) {
+                $q->whereBetween('created_at', [$request->from, $request->to]);
+            }
+        })
+        ->groupBy('hour')
+        ->orderBy('hour')
+        ->get();
+
+    return response()->json([
+        'users' => $report,
+        'rushHour' => $rushHourData,
+    ]);
 }
 public function search(Request $request)
     {

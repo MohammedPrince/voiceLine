@@ -226,12 +226,13 @@
                 <button class="scroll-to-bottom" id="scrollToBottom" title="انتقل إلى الأسفل">
                     <i class="fas fa-arrow-down"></i>
                 </button>
+@stack('scripts')
 
                 <!-- Scripts -->
                 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
 
-                <script>
+                <!-- <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     // عناصر أزرار التمرير
                     const scrollToTopBtn = document.getElementById('scrollToTop');
@@ -328,12 +329,12 @@
     </tr>`;
                     tableBody.innerHTML += row;
                 });
-                </script>
+                </script> -->
                 <!-- end modal-body -->
 
 
                 <!-- Bootstrap + Chart.js -->
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+                <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
                 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
                 <script>
@@ -478,9 +479,8 @@
 
                 // initial render (already uses sampleData)
                 updateChart(sampleData);
-                </script>
-                @stack('scripts')
-                <!-- Optional page-specific scripts -->
+                </script> -->
+             
 </body>
 
 </html>
