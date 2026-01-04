@@ -173,33 +173,30 @@
         </div>
         <div class="field">
             <div class="label">Category</div>
-            <select id="category" name="category">
-                <option value="" selected></option>
-                <option value="1">Data Follow and Verification</option>
-                <option value="42">General Inquiries</option>
-                <option value="3">Finance</option>
-                <option value="2">Certificates and Statements</option>
-                <option value="14">E-Learning</option>
-                <option value="28">Update Ministry Graduates List</option>
-                <option value="16">CESD / CTS (Staff only)</option>
-                <option value="43">Human Resources</option>
-                <option value="24">Reports</option>
-                <option value="23">Higher Management</option>
-                <option value="30">External Transfer & Elevation</option>
-                <option value="31">New Admission</option>
-                <option value="32">Faculty of Geoinformatics</option>
-                <option value="33">Fine Arts & Interior Design</option>
-                <option value="34">Faculty of Architecture</option>
-                <option value="35">Telecommunication & Space Tech</option>
-                <option value="37">Information Technology</option>
-                <option value="38">Engineering</option>
-                <option value="39">Computer Sciences</option>
-                <option value="40">Business Administration</option>
-                <option value="41">Postgraduate Studies</option>
-                <option value="44">BetterU Service</option>
-                <option value="45">Technology Horizon Journal</option>
-                <!-- Other options -->
-            </select>
+<select id="category" name="category">
+        <option value="" selected></option>
+
+        <option value="1">[Certificates] Graduates Lists</option>
+        <option value="2">[Certificates] Delayed Issuance</option>
+        <option value="3">[Certificates] Payment Issues</option>
+
+        <option value="4">[Finance] Delayed Approval</option>
+
+        <option value="5">[Academic] Delayed Approval</option>
+        <option value="6">[Academic] Delayed Result</option>
+        <option value="7">[Academic] Registration</option>
+        <option value="8">[Academic] Verification</option>
+
+        <option value="9">[E-Learning] Account Activation</option>
+        <option value="10">[E-Learning] F/Z Course Enrolment</option>
+        <option value="11">[E-Learning] Wrong Courses</option>
+
+        <option value="12">[HelpDesk] Password Reset</option>
+
+        <option value="13">[General Inquiry] New Admission</option>
+        <option value="14">[General Inquiry] General</option>
+    </select>
+
         </div>
         <div id="ticket-fields-group">
             <div class="flex">

@@ -72,31 +72,28 @@ $results = $query->groupBy('category')->get();
     // Private helper to keep the list organized
 private function getCategoriesMap()
 {
-    return [
-        "1"  => "Data Follow and Verification",
-        "42" => "General Inquiries",
-        "3"  => "Finance",
-        "2"  => "Certificates and Statements",
-        "14" => "E-Learning",
-        "28" => "Update Ministry Graduates List",
-        "16" => "CESD / CTS (Staff only)",
-        "43" => "Human Resources",
-        "24" => "Reports",
-        "23" => "Higher Management",
-        "30" => "External Transfer & Elevation",
-        "31" => "New Admission",
-        "32" => "Faculty of Geoinformatics",
-        "33" => "Fine Arts & Interior Design",
-        "34" => "Faculty of Architecture",
-        "35" => "Telecommunication & Space Tech",
-        "37" => "Information Technology",
-        "38" => "Engineering",
-        "39" => "Computer Sciences",
-        "40" => "Business Administration",
-        "41" => "Postgraduate Studies",
-        "44" => "BetterU Service",
-        "45" => "Technology Horizon Journal",
-    ];
+   return [
+    "1"  => "[Certificates] Graduates Lists",
+    "2"  => "[Certificates] Delayed Issuance",
+    "3"  => "[Certificates] Payment Issues",
+
+    "4"  => "[Finance] Delayed Approval",
+
+    "5"  => "[Academic] Delayed Approval",
+    "6"  => "[Academic] Delayed Result",
+    "7"  => "[Academic] Registration",
+    "8"  => "[Academic] Verification",
+
+    "9"  => "[E-Learning] Account Activation",
+    "10" => "[E-Learning] F/Z Course Enrolment",
+    "11" => "[E-Learning] Wrong Courses",
+
+    "12" => "[HelpDesk] Password Reset",
+
+    "13" => "[General Inquiry] New Admission",
+    "14" => "[General Inquiry] General",
+];
+
 }
  
 
