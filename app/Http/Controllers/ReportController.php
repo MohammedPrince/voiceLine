@@ -251,35 +251,92 @@ public function dashboardData(Request $request)
         'rushHour' => $rushHourData,
     ]);
 }
+// public function search(Request $request)
+//     {
+//         $query = VoiceCall::query();
+
+//         // البحث بالفترة الزمنية
+//         if ($request->filled('start_date') && $request->filled('end_date')) {
+//             $query->whereBetween('created_at', [
+//                 $request->start_date . ' 00:00:00',
+//                 $request->end_date . ' 23:59:59'
+//             ]);
+//         }
+
+//         // البحث الديناميكي على كل الحقول
+//         $searchableFields = [
+//             'call_id', 'ticket_number', 'customer_type', 'stud_id', 'staff_ID',
+//             'category', 'issue', 'Solution_Note', 'Found_Status', 'Final_Status',
+//             'priority', 'parent_id', 'parent_name', 'parent_phone', 'handled_by_user_id'
+//         ];
+
+//         foreach ($searchableFields as $field) {
+//             if ($request->filled($field)) {
+//                 $query->where($field, 'like', '%' . $request->$field . '%');
+//             }
+//         }
+
+//         $results = $query->get();
+
+//         return response()->json($results);
+//     }
 public function search(Request $request)
-    {
-        $query = VoiceCall::query();
+{
+    $query = VoiceCall::query();
 
-        // البحث بالفترة الزمنية
-        if ($request->filled('start_date') && $request->filled('end_date')) {
-            $query->whereBetween('created_at', [
-                $request->start_date . ' 00:00:00',
-                $request->end_date . ' 23:59:59'
-            ]);
-        }
-
-        // البحث الديناميكي على كل الحقول
-        $searchableFields = [
-            'call_id', 'ticket_number', 'customer_type', 'stud_id', 'staff_ID',
-            'category', 'issue', 'Solution_Note', 'Found_Status', 'Final_Status',
-            'priority', 'parent_id', 'parent_name', 'parent_phone', 'handled_by_user_id'
-        ];
-
-        foreach ($searchableFields as $field) {
-            if ($request->filled($field)) {
-                $query->where($field, 'like', '%' . $request->$field . '%');
-            }
-        }
-
-        $results = $query->get();
-
-        return response()->json($results);
+    // Filter by date range
+    if ($request->filled('start_date') && $request->filled('end_date')) {
+        $query->whereBetween('created_at', [
+            $request->start_date . ' 00:00:00',
+            $request->end_date . ' 23:59:59'
+        ]);
     }
+
+    // Searchable fields for dynamic filtering
+    $searchableFields = [
+        'call_id', 'ticket_number', 'customer_type', 'stud_id', 'staff_ID',
+        'category', 'issue', 'Solution_Note', 'Found_Status', 'Final_Status',
+        'priority', 'parent_id', 'parent_name', 'parent_phone', 'handled_by_user_id'
+    ];
+
+    foreach ($searchableFields as $field) {
+        if ($request->filled($field)) {
+            $query->where($field, 'like', '%' . $request->$field . '%');
+        }
+    }
+
+    $results = $query->get();
+
+    // Your existing category map
+    $categoryMap = $this->getCategoriesMap();
+
+    // Define your Final_Status map (example, adjust keys and labels as needed)
+    $finalStatusMap = [
+        '1' => 'Resolved',
+        '2' => 'Submitted',
+        '3' => 'Escalated',
+    ];
+
+    // Map category and Final_Status IDs to their textual names
+    $mappedResults = $results->map(function ($item) use ($categoryMap, $finalStatusMap) {
+        return [
+            'call_id' => $item->call_id,
+            'ticket_number' => $item->ticket_number,
+            'customer_type' => $item->customer_type,
+            'parent_name' => $item->parent_name,
+            // Map category id to text or fallback to raw value
+            'category' => $categoryMap[$item->category] ?? 'Other/Unknown (' . $item->category . ')',
+            'issue' => $item->issue,
+            // Map Final_Status to text or fallback raw value
+            'Final_Status' => $finalStatusMap[$item->Final_Status] ?? ($item->Final_Status ?? 'Unknown'),
+             'created_at' => $item->created_at ? Carbon::parse($item->created_at)->format('Y-m-d H:i:s') : null,
+             'stud_id' => $item->stud_id, 
+        ];
+    });
+
+    return response()->json($mappedResults);
+}
+
     public function voiceCallsReport()
 {
     return view('reports.report');

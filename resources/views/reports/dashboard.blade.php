@@ -24,6 +24,7 @@ canvas {
     <ul>
         <li><a href="/reports"> General Report </a></li>
         <li><a href="/reports/calls-per-user" class="active">Detailed Report</a></li>
+         <li><a href="/reports/voice-calls">Voice Calls Report</a></li>
     </ul>
 
     <h5>Calls Per Users Report:</h5>
