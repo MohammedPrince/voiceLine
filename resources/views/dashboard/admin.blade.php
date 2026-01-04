@@ -6,9 +6,9 @@
 @section('content')
   <div class="choices">
         
-<a class="choice" href="{{ route('calls.create') }}">
+<!-- <a class="choice" href="{{ route('calls.create') }}">
         <span>User Management </span>
-    </a>
+    </a> -->
     <!-- Optional additional nav items -->
     <a class="choice" href="{{ url('reports/') }}">
         <span>Reports</span>

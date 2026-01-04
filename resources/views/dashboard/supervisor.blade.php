@@ -1,8 +1,19 @@
+
 @extends('layouts.app')
-
+  
 @section('title', 'Home Page')
-
+ 
 @section('content')
-  <h1>Welcome to FU System</h1>
-  <p>This is the home page content.</p>
+  <div class="choices">
+      
+    <!-- Optional additional nav items -->
+    <a class="choice" href="{{ url('reports/') }}">
+        <span>Reports</span>
+    </a>
+    <a class="choice" href="{{ route('student') }}">
+        <span>Call Entry</span>
+    </a>
+    
+</div>
+
 @endsection
