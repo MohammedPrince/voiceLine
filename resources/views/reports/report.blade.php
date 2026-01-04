@@ -226,7 +226,7 @@ document.getElementById("filterBtn").addEventListener("click", function() {
                         </button>
                     </td>
                     <td>
-                    <button class="btn btn-sm btn-warning studentDataBtn" data-student-id="${row.student_id ?? ''}">
+                    <button class="btn btn-sm btn-warning studentDataBtn" data-student-id="${row.stud_id ?? ''}">
                           Student Data
                     </button>
                     </td>
