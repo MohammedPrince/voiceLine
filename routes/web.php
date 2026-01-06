@@ -6,11 +6,14 @@ use  App\Http\Controllers\{
     AdminDashboardController,
     SupervisorDashboardController,ProfileController,
     UserDashboardController,CallController,ReportController,
-    AuthenticatedSessionController
+    AuthenticatedSessionController,
+    UserProfileController
 };
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
  use Illuminate\Support\Facades\Log;
+
+
 
 
 Route::get('/', function () {
@@ -36,6 +39,10 @@ require __DIR__.'/auth.php';
 Route::get('/dashboard', DashboardRedirectController::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/profile-data/{id}', [UserProfileController::class, 'profileData'])
+        ->name('profile.data');
+});
 
 // لوحات الأدوار
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -169,3 +176,19 @@ Route::get('/log-url', function (\Illuminate\Http\Request $request) {
 // routes/web.php
 Route::get('/reports/voice-calls', [ReportController::class, 'voiceCallsReport'])->name('reports.voicecalls');
 Route::post('/reports/voice-calls/search', [ReportController::class, 'search'])->name('reports.voicecalls.search');
+
+
+Route::get('/user-profile', [UserProfileController::class, 'dashboard'])->name('user.profile.dashboard');
+Route::get('/profile-data/{userId}', [UserProfileController::class, 'getProfileData'])
+    ->name('profile.data')
+    ->middleware('auth');
+
+
+Route::get('/profile-data/{userId}', [UserProfileController::class, 'profileData'])->middleware('auth');
+// Route::get('/dashboard', [UserProfileController::class, 'dashboard'])->middleware('auth');
+Route::get('/user-calls', [UserProfileController::class, 'search'])->name('usercalls');
+
+Route::get('/call-archive', [UserProfileController::class, 'callArchive'])->name('call.archive');
+// The update route (POST) - This matches your AJAX URL and fixes the 405 error
+Route::post('/calls/update-status', [CallController::class, 'updateStatus'])->name('calls.update-status');
+Route::get('/get-users-list', [App\Http\Controllers\ReportController::class, 'getUsersList']);

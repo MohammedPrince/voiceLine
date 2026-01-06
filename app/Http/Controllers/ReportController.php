@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\VoiceCall;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
@@ -185,6 +186,7 @@ private function getCategoriesMap()
                 DB::raw("SUM(CASE WHEN v.Final_Status = '" . self::STATUS_RESOLVED . "' THEN 1 ELSE 0 END) AS Resolved"),
                 DB::raw("SUM(CASE WHEN v.Final_Status = '" . self::STATUS_ESCALATED . "' THEN 1 ELSE 0 END) AS Escalated"),
                 DB::raw("SUM(CASE WHEN v.Final_Status = '" . self::STATUS_SUBMITTED . "' THEN 1 ELSE 0 END) AS Submitted"),
+                 DB::raw("SUM(CASE WHEN v.Final_Status = '" . self::STATUS_UPDATED . "' THEN 1 ELSE 0 END) AS Updated"),
               /*  DB::raw("SUM(CASE WHEN v.Final_Status = 'In Progress' THEN 1 ELSE 0 END) AS In_Progress"),
                 DB::raw("SUM(CASE WHEN v.Final_Status = 'Waiting Approval' THEN 1 ELSE 0 END) AS Waiting_Approval"),
                 DB::raw("SUM(CASE WHEN v.Final_Status = 'Under Review' THEN 1 ELSE 0 END) AS Under_Review"),
@@ -204,6 +206,7 @@ private function getCategoriesMap()
 const STATUS_RESOLVED = '1';
 const STATUS_SUBMITTED = '2';
 const STATUS_ESCALATED = '3';
+const STATUS_UPDATED = '4';
 
 public function dashboardData(Request $request)
 {
@@ -216,6 +219,7 @@ public function dashboardData(Request $request)
              DB::raw("SUM(CASE WHEN v.Final_Status = '" . self::STATUS_RESOLVED . "' THEN 1 ELSE 0 END) AS Resolved"),
                 DB::raw("SUM(CASE WHEN v.Final_Status = '" . self::STATUS_SUBMITTED . "' THEN 1 ELSE 0 END) AS Submitted"),
                 DB::raw("SUM(CASE WHEN v.Final_Status = '" . self::STATUS_ESCALATED . "' THEN 1 ELSE 0 END) AS Escalated"),
+                DB::raw("SUM(CASE WHEN v.Final_Status = '" . self::STATUS_UPDATED . "' THEN 1 ELSE 0 END) AS Updated"),
               /*  DB::raw("SUM(CASE WHEN v.Final_Status = 'In Progress' THEN 1 ELSE 0 END) AS In_Progress"),
                 DB::raw("SUM(CASE WHEN v.Final_Status = 'Waiting Approval' THEN 1 ELSE 0 END) AS Waiting_Approval"),
                 DB::raw("SUM(CASE WHEN v.Final_Status = 'Under Review' THEN 1 ELSE 0 END) AS Under_Review"),
@@ -295,17 +299,20 @@ public function dashboardData(Request $request)
 //     }
 public function search(Request $request)
 {
-    $query = VoiceCall::query();
+    // 1. Start query with a join to get the User Name
+    $query = VoiceCall::query()
+        ->leftJoin('users', 'voice_calls.handled_by_user_id', '=', 'users.id')
+        ->select('voice_calls.*', 'users.name as handled_by_name'); // Alias the name
 
-    // Filter by date range
+    // 2. Filter by date range
     if ($request->filled('start_date') && $request->filled('end_date')) {
-        $query->whereBetween('created_at', [
+        $query->whereBetween('voice_calls.created_at', [
             $request->start_date . ' 00:00:00',
             $request->end_date . ' 23:59:59'
         ]);
     }
 
-    // Searchable fields for dynamic filtering
+    // 3. Searchable fields (Note: specifying table name to avoid ambiguity)
     $searchableFields = [
         'call_id', 'ticket_number', 'customer_type', 'stud_id', 'staff_ID',
         'category', 'issue', 'Solution_Note', 'Found_Status', 'Final_Status',
@@ -314,36 +321,34 @@ public function search(Request $request)
 
     foreach ($searchableFields as $field) {
         if ($request->filled($field)) {
-            $query->where($field, 'like', '%' . $request->$field . '%');
+            $query->where('voice_calls.' . $field, 'like', '%' . $request->$field . '%');
         }
     }
 
     $results = $query->get();
 
-    // Your existing category map
     $categoryMap = $this->getCategoriesMap();
-
-    // Define your Final_Status map (example, adjust keys and labels as needed)
     $finalStatusMap = [
         '1' => 'Resolved',
         '2' => 'Submitted',
         '3' => 'Escalated',
+        '4' => 'updated to Resolved',
     ];
 
-    // Map category and Final_Status IDs to their textual names
+    // 4. Map the results
     $mappedResults = $results->map(function ($item) use ($categoryMap, $finalStatusMap) {
         return [
-            'call_id' => $item->call_id,
+            'handled_by'    => $item->handled_by_name ?? 'Not Assigned', // Add this line!
+            // 'call_id'       => $item->call_id,
             'ticket_number' => $item->ticket_number,
             'customer_type' => $item->customer_type,
-            'parent_name' => $item->parent_name,
-            // Map category id to text or fallback to raw value
-            'category' => $categoryMap[$item->category] ?? 'Other/Unknown (' . $item->category . ')',
-            'issue' => $item->issue,
-            // Map Final_Status to text or fallback raw value
-            'Final_Status' => $finalStatusMap[$item->Final_Status] ?? ($item->Final_Status ?? 'Unknown'),
-             'created_at' => $item->created_at ? Carbon::parse($item->created_at)->format('Y-m-d H:i:s') : null,
-             'stud_id' => $item->stud_id, 
+            'parent_name'   => $item->parent_name,
+            'category'      => $categoryMap[$item->category] ?? 'Other (' . $item->category . ')',
+            'issue'         => $item->issue,
+            'Final_Status'  => $finalStatusMap[$item->Final_Status] ?? ($item->Final_Status ?? 'Unknown'),
+            'created_at'    => $item->created_at ? Carbon::parse($item->created_at)->format('Y-m-d H:i:s') : null,
+            'stud_id'       => $item->stud_id,
+            
         ];
     });
 
@@ -354,4 +359,83 @@ public function search(Request $request)
 {
     return view('reports.report');
 }
+public function getUsersList()
+{
+    // This gets all unique users who have handled at least one call
+    $users = \App\Models\User::whereHas('voiceCalls') // Assuming the relationship exists
+        ->select('id', 'name')
+        ->orderBy('name')
+        ->get();
+
+    return response()->json($users);
+}
+
+
+// public function currentUserStatusChart(Request $request)
+// {
+//     $userId = Auth::id();
+
+//     $query = DB::table('voice_calls')
+//         ->select(
+//             DB::raw("SUM(CASE WHEN Final_Status = '1' THEN 1 ELSE 0 END) AS Resolved"),
+//             DB::raw("SUM(CASE WHEN Final_Status = '2' THEN 1 ELSE 0 END) AS Submitted"),
+//             DB::raw("SUM(CASE WHEN Final_Status = '3' THEN 1 ELSE 0 END) AS Escalated")
+//         )
+//         ->where('handled_by_user_id', $userId);
+
+//     // Optional period filtering
+//     if ($request->filled('period')) {
+//         switch ($request->period) {
+//             case 'today':
+//                 $query->whereDate('created_at', Carbon::today());
+//                 break;
+
+//             case 'week':
+//                 $query->where('created_at', '>=', now()->startOfWeek());
+//                 break;
+
+//             case 'month':
+//                 $query->where('created_at', '>=', now()->startOfMonth());
+//                 break;
+
+//             case 'custom':
+//                 if ($request->from && $request->to) {
+//                     $query->whereBetween('created_at', [
+//                         $request->from . ' 00:00:00',
+//                         $request->to . ' 23:59:59'
+//                     ]);
+//                 }
+//                 break;
+//         }
+//     }
+
+//     $result = $query->first();
+
+//     return response()->json([
+//         'user' => [
+//             'Resolved'  => $result->Resolved ?? 0,
+//             'Submitted' => $result->Submitted ?? 0,
+//             'Escalated' => $result->Escalated ?? 0,
+//         ]
+//     ]);
+// }
+
+
+// public function userCallsDashboard()
+// {
+//     $user = Auth::user();
+
+//     $calls = VoiceCall::where('handled_by_user_id', $user->id)
+//                       ->orderBy('created_at', 'desc')
+//                       ->get();
+
+//     $totalCalls = $calls->count();
+
+//     $todayCalls = VoiceCall::where('handled_by_user_id', $user->id)
+//                            ->whereDate('created_at', now()->toDateString())
+//                            ->count();
+
+//     return view('dashboard_user', compact('user', 'calls', 'totalCalls', 'todayCalls'));
+// }
+
 }

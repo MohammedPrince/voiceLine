@@ -7,6 +7,7 @@
 @section('content')
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
     #mainAlert {
   position: fixed;
@@ -16,7 +17,24 @@
   z-index: 1055; /* above bootstrap modals */
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
-
+ /* Clean, modern pagination style */
+    .pagination .page-link {
+        color: #0d6efd;
+        border: 1px solid #dee2e6;
+        margin: 0 2px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+    .pagination .page-item.active .page-link {
+        color:white;
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
+    }
+    .pagination .page-link:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-1px);
+    }
 </style>
 <div class="reports-container mt-4">
     <ul>
@@ -69,7 +87,7 @@
         <div class="col-md-3">
             <label class="form-label">Category</label>
  <select id="category" name="category">
-    <option value="" selected></option>
+    <option value="" selected> select a category</option>
 
     <!-- Certificates -->
     <option value="1">[Certificates] Graduates Lists</option>
@@ -117,6 +135,23 @@
 
 
         </div>
+        <div class="col-md-3">
+    <label class="form-label">Assigned To</label>
+    <select id="userFilter" name="handled_by_user_id" class="form-select">
+        <option value="" selected>All Users</option>
+        </select>
+</div>
+
+<div class="col-md-3">
+    <label class="form-label">Final Status</label>
+    <select name="Final_Status" class="form-select">
+        <option value="" selected>All Statuses</option>
+        <option value="1">Resolved</option>
+        <option value="2">Submitted</option>
+        <option value="3">Escalated</option>
+        <option value="4">updated to Resolved</option>
+    </select>
+</div>
 <div class="col-12 d-flex justify-content-center gap-2">
     <button type="button" id="filterBtn"
         class="btn btn-primary btn-sm"
@@ -144,14 +179,16 @@
             <th>Ticket</th>
             <th>Category</th>
             <th>Final Status</th>
-            <th>Created At</th>
+            <th>Std-index</th>
             <th>Details</th>
             <th>Data</th>
         </tr>
     </thead>
     <tbody></tbody>
 </table>
-
+<nav aria-label="Table navigation" class="mt-4">
+    <ul id="paginationControls" class="pagination justify-content-center"></ul>
+</nav>
 </div>
 <!-- Modal -->
 <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
@@ -170,6 +207,8 @@
     </div>
   </div>
 </div>
+
+
 <div class="modal fade" id="StatusModal" tabindex="-1" aria-labelledby="StatusModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -249,7 +288,6 @@
                                     <th style="color: #EC8305;">Ticket ID</th>
                                     <th style="color: #EC8305;">Ticket Subject</th>
                                     <th style="color: #EC8305;">URL</th>
-                                    <th style="color: #EC8305;">Get</th>
                                     <th style="color: #EC8305;">Remark</th>
                                 </tr>
                             </thead>
@@ -338,51 +376,169 @@ document.addEventListener('click', function(e) {
 
 </script> -->
  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    fetch('/get-users-list') // Make sure this route exists in web.php
+        .then(response => response.json())
+        .then(data => {
+            const userSelect = document.getElementById('userFilter');
+            data.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = user.name;
+                userSelect.appendChild(option);
+            });
+        });
+});
+// Global Variables
+let allData = []; 
+let currentPage = 1;
+const rowsPerPage = 15;
+
+// Search/Filter Event
 document.getElementById("filterBtn").addEventListener("click", function() {
+    let tbody = document.querySelector("#resultsTable tbody");
+    
+    // Show Loading State
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2 mb-0 text-muted">Fetching records...</p>
+    </td></tr>`;
+
     let formData = new FormData(document.getElementById("filterForm"));
 
     fetch("{{ route('reports.voicecalls.search') }}", {
         method: "POST",
-        headers: {
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-        },
+        headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
         body: formData
     })
     .then(res => res.json())
     .then(data => {
-        let tbody = document.querySelector("#resultsTable tbody");
-        tbody.innerHTML = "";
-        if (data.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='8' class='text-center'>No Data Found</td></tr>";
-            return;
-        }
-        let rowsHtml = '';
-        data.forEach(row => {
-            let fullData = encodeURIComponent(JSON.stringify(row));
-            rowsHtml += `
-                <tr>
-                    <td>${row.call_id ?? ''}</td>
-                    <td>${row.ticket_number ?? ''}</td>
-                    <td>${row.category ?? ''}</td>
-                    <td>${row.Final_Status ?? ''}</td>
-                    <td>${row.created_at ?? ''}</td>
-                    <td>
-                        <button class="btn btn-sm btn-info detailsBtn" data-details="${fullData}">
-                            More Details
-                        </button>
-                    </td>
-                    <td>
-                    <button class="btn btn-sm btn-warning studentDataBtn" data-student-id="${row.stud_id ?? ''}">
-                          Student Data
-                    </button>
-                    </td>
-                </tr>
-            `;
-        });
-        tbody.innerHTML = rowsHtml;
-    });  // <-- This closes the .then(data => { ... }) callback
-});  // <-- This closes the addEventListener callback
+        allData = data; 
+        currentPage = 1; 
+        renderTablePage(currentPage);
+    })
+    .catch(error => {
+        tbody.innerHTML = "<tr><td colspan='7' class='text-center text-danger'>Error loading data.</td></tr>";
+        console.error('Error:', error);
+    });
+});
 
+// Render Function
+function renderTablePage(page) {
+    let tbody = document.querySelector("#resultsTable tbody");
+    let paginationContainer = document.getElementById("paginationControls");
+    
+    tbody.innerHTML = "";
+    paginationContainer.innerHTML = "";
+
+    if (allData.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='7' class='text-center'>No Data Found</td></tr>";
+        return;
+    }
+
+    // Calculate slicing
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const paginatedItems = allData.slice(start, end);
+
+    // Build Rows
+    let rowsHtml = '';
+    paginatedItems.forEach(row => {
+        let fullData = encodeURIComponent(JSON.stringify(row));
+        rowsHtml += `
+            <tr>
+                <td><span class="fw-bold text-muted">${row.call_id ?? ''}</span></td>
+                <td>${row.ticket_number ?? ''}</td>
+                <td><small>${row.category ?? ''}</small></td>
+                <td>${getStatusBadge(row.Final_Status)}</td>
+                <td>${row.stud_id ?? ''}</td>
+                <td>
+                    <button class="btn btn-sm btn-info detailsBtn text-white" data-details="${fullData}">
+                        <i class="fas fa-eye me-1"></i> Details
+                    </button>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-warning studentDataBtn" data-student-id="${row.stud_id ?? ''}">
+                        <i class="fas fa-user-graduate me-1"></i> Student
+                    </button>
+                </td>
+            </tr>`;
+    });
+    tbody.innerHTML = rowsHtml;
+
+    // Build Pagination Logic
+    const totalPages = Math.ceil(allData.length / rowsPerPage);
+    if (totalPages > 1) {
+        let paginationHtml = '';
+
+        // Previous & First
+        paginationHtml += `
+            <li class="page-item ${page === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="javascript:void(0)" onclick="changePage(1)"><i class="fas fa-angle-double-left"></i></a>
+            </li>
+            <li class="page-item ${page === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="javascript:void(0)" onclick="changePage(${page - 1})"><i class="fas fa-chevron-left"></i></a>
+            </li>`;
+
+        // Page Numbers (Smart range: show 2 before and 2 after current)
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || (i >= page - 2 && i <= page + 2)) {
+                paginationHtml += `
+                    <li class="page-item ${i === page ? 'active' : ''}">
+                        <a class="page-link" href="javascript:void(0)" onclick="changePage(${i})">${i}</a>
+                    </li>`;
+            } else if (i === page - 3 || i === page + 3) {
+                paginationHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            }
+        }
+
+        // Next & Last
+        paginationHtml += `
+            <li class="page-item ${page === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="javascript:void(0)" onclick="changePage(${page + 1})"><i class="fas fa-chevron-right"></i></a>
+            </li>
+            <li class="page-item ${page === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="javascript:void(0)" onclick="changePage(${totalPages})"><i class="fas fa-angle-double-right"></i></a>
+            </li>`;
+
+        paginationContainer.innerHTML = paginationHtml;
+    }
+}
+
+// Helper: Status Badges
+function getStatusBadge(status) {
+    if (!status) return '<span class="badge bg-secondary">Unknown</span>';
+    const s = status.toLowerCase();
+// 1. Check for "Updated" FIRST (to catch "updated-to-resolved")
+    if (s.includes('updated') || s === '4') {
+        return '<span class="badge bg-warning text-dark"><i class="fas fa-check-circle me-1"></i> Updated</span>';
+    }
+
+    // 2. Check for Resolved
+    if (s.includes('resolved') || s === '1') {
+        return '<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Resolved</span>';
+    }
+
+    // 3. Check for Submitted
+    if (s.includes('submitted') || s === '2') {
+        return '<span class="badge bg-primary"><i class="fas fa-paper-plane me-1"></i> Submitted</span>';
+    }
+
+    // 4. Check for Escalated
+    if (s.includes('escalated') || s === '3') {
+        return '<span class="badge bg-danger"><i class="fas fa-exclamation-triangle me-1"></i> Escalated</span>';
+    }
+
+    return `<span class="badge bg-secondary">${status}</span>`;
+}
+
+// Global Page Switcher
+window.changePage = function(page) {
+    currentPage = page;
+    renderTablePage(currentPage);
+    // Smooth scroll back to table top
+    document.getElementById('resultsTable').scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
 // Using Bootstrap 5's modal JS
 const detailsModal = new bootstrap.Modal(document.getElementById('detailsModal'));
 const modalDetailsBody = document.getElementById('modalDetailsBody');
@@ -396,8 +552,9 @@ document.addEventListener('click', function(e) {
 
         // Build table rows with all details including those shown in the table
         for (const [key, value] of Object.entries(detailsData)) {
-            let label = key.replace(/_/g, ' ');
-
+           // 1. Replace underscores and capitalize each word
+    let label = key.replace(/_/g, ' ')
+                   .replace(/\b\w/g, char => char.toUpperCase());
             // Rename 'parent_name' to 'Name'
             if (key === 'parent_name') {
                 label = 'Name';
@@ -502,7 +659,6 @@ if (data.clearance && data.clearance.length > 0) {
                             <td>${ticket.trackid || ''}</td>
                             <td>${ticket.subject || ''}</td>
                             <td><a href="https://hdesk.fu.edu.sd/admin/admin_ticket.php?track=${ticket.trackid}" target="_blank">View</a></td>
-                            <td><a href="javascript:void(0);" data-bs-dismiss="modal" onclick="fillTicketForm('${ticket.trackid}')">Get</a></td>
                             <td>${ticket.priority || ''}</td>
                         </tr>`;
                     ticketsTable.insertAdjacentHTML('beforeend', row);

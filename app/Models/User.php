@@ -48,5 +48,9 @@ class User extends Authenticatable
         ];
     }
 
+public function voiceCalls()
+{
+    return $this->hasMany(VoiceCall::class, 'handled_by_user_id', 'id');
+}
     
 }

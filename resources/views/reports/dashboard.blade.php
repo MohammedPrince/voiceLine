@@ -105,6 +105,7 @@ canvas {
                 <th>Resolved</th>
                 <th>Submitted</th>
                 <th>Escalated</th>
+                <th>Updated</th>
 
 
             </tr>
@@ -117,7 +118,7 @@ canvas {
                 <td>{{ $row->Resolved }}</td>
                 <td>{{ $row->Submitted }}</td>
                 <td>{{ $row->Escalated }}</td>
-
+<td>{{ $row->Updated }}</td>
 
             </tr>
             @endforeach
@@ -204,6 +205,9 @@ const totalSubmitted = users.reduce(
 const totalEscalated = users.reduce(
     (sum, u) => sum + toNumber(u.Escalated), 0
 );
+const totalUpdated = users.reduce(
+    (sum, u) => sum + toNumber(u.Updated), 0
+);
 if (totalStatusChart) {
     totalStatusChart.destroy();
 }
@@ -212,17 +216,19 @@ if (totalStatusChart) {
 totalStatusChart = new Chart(ctxTotalStatus, {
     type: 'doughnut',
     data: {
-        labels: ['Resolved', 'Submitted', 'Escalated'],
+        labels: ['Resolved', 'Submitted', 'Escalated','Updated'],
         datasets: [{
             data: [
                 totalResolved,
                 totalSubmitted,
-                totalEscalated
+                totalEscalated,
+                totalUpdated
             ],
             backgroundColor: [
                 '#36A2EB', // Received
                 '#FFCE56', // Submitted
-                '#FF6384'  // Escalated
+                '#FF6384',  // Escalated
+                '#4BC0C0'
             ]
         }]
     },
@@ -375,6 +381,7 @@ function renderRushHourChart(rushHourData) {
                 <td>${row.Resolved}</td>
                 <td>${row.Submitted}</td>
                 <td>${row.Escalated}</td>
+                <td>${row.Updated}</td>
             </tr>`;
     });
 }
