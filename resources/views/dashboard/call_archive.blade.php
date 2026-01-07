@@ -199,6 +199,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <input type="hidden" id="updateCallId" name="call_id" value="">
                 <input type="hidden" id="updateTicketNumber" name="ticket_number" value="">
 
                 <div class="mb-3">
@@ -331,6 +332,7 @@ $(document).ready(function() {
                     </td>
                     <td>
                         <button class="btn btn-sm btn-warning updateBtn" 
+                            data-id="${call.call_id}"
                             data-ticket="${call.ticket_number}"
                             data-status="${finalStatus}">
                             Update
@@ -498,27 +500,29 @@ $(document).ready(function() {
     });
 
     // Update button click handler
-    $(document).on('click', '.updateBtn', function() {
-        const ticket = $(this).data('ticket');
-        const status = $(this).data('status');
+   $(document).on('click', '.updateBtn', function() {
+    const callId = $(this).data('id'); // Get the ID
+    const ticket = $(this).data('ticket');
+    const status = $(this).data('status');
 
-        $('#updateTicketNumber').val(ticket);
-        $('#finalStatus').val(status);
-        $('#statusNote').val('');
+    $('#updateCallId').val(callId); // Set the ID in the hidden input
+    $('#updateTicketNumber').val(ticket);
+    $('#finalStatus').val(status);
+    $('#statusNote').val('');
 
-        updateModal.show();
-    });
+    updateModal.show();
+});
 
     // Submit update form with AJAX
     $('#updateForm').on('submit', function(e) {
-        e.preventDefault();
+     e.preventDefault();
 
-        const formData = {
-            ticket_number: $('#updateTicketNumber').val(),
-            final_status: $('#finalStatus').val(),
-            status_note: $('#statusNote').val(),
-            _token: '{{ csrf_token() }}'
-        };
+    const formData = {
+        call_id: $('#updateCallId').val(), // Use the ID here
+        final_status: $('#finalStatus').val(),
+        status_note: $('#statusNote').val(),
+        _token: '{{ csrf_token() }}'
+    };
 
         $.ajax({
             url: '{{ route("calls.update-status") }}',

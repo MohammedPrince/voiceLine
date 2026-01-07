@@ -177,7 +177,7 @@ Route::get('/log-url', function (\Illuminate\Http\Request $request) {
 Route::get('/reports/voice-calls', [ReportController::class, 'voiceCallsReport'])->name('reports.voicecalls');
 Route::post('/reports/voice-calls/search', [ReportController::class, 'search'])->name('reports.voicecalls.search');
 
-
+// added routes for user popup code
 Route::get('/user-profile', [UserProfileController::class, 'dashboard'])->name('user.profile.dashboard');
 Route::get('/profile-data/{userId}', [UserProfileController::class, 'getProfileData'])
     ->name('profile.data')
@@ -185,10 +185,10 @@ Route::get('/profile-data/{userId}', [UserProfileController::class, 'getProfileD
 
 
 Route::get('/profile-data/{userId}', [UserProfileController::class, 'profileData'])->middleware('auth');
-// Route::get('/dashboard', [UserProfileController::class, 'dashboard'])->middleware('auth');
+
 Route::get('/user-calls', [UserProfileController::class, 'search'])->name('usercalls');
 
 Route::get('/call-archive', [UserProfileController::class, 'callArchive'])->name('call.archive');
-// The update route (POST) - This matches your AJAX URL and fixes the 405 error
-Route::post('/calls/update-status', [CallController::class, 'updateStatus'])->name('calls.update-status');
+
+Route::post('/calls/update-status', [UserProfileController::class, 'updateStatus'])->name('calls.update-status');
 Route::get('/get-users-list', [App\Http\Controllers\ReportController::class, 'getUsersList']);

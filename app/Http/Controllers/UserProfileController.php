@@ -228,26 +228,28 @@ public function callArchive()
 {
     return view('dashboard.call_archive');
 }
-   
-public function updateStatus(Request $request)
+   public function updateStatus(Request $request)
 {
     try {
         $request->validate([
-            'ticket_number' => 'required|string|exists:voicecalls,ticket_number',
+            // Use call_id for the search as it is the absolute unique primary key
+            'call_id' => 'required|exists:voice_calls,call_id', 
             'final_status' => 'required|string|in:Resolved,Submitted,Escalated',
             'status_note' => 'nullable|string',
         ]);
 
         $userId = auth()->id();
 
-        $call = VoiceCall::where('ticket_number', $request->ticket_number)->first();
+        // Find the specific row by its ID
+        $call = VoiceCall::find($request->call_id);
 
         if (!$call) {
-            return response()->json(['error' => 'Call not found'], 404);
+            return response()->json(['error' => 'Call record not found'], 404);
         }
 
+        // Authorization check
         if ($call->handled_by_user_id !== $userId) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            return response()->json(['error' => 'You do not have permission to update this call'], 403);
         }
 
         $statusMap = [
@@ -257,23 +259,20 @@ public function updateStatus(Request $request)
         ];
 
         $finalStatusCode = $statusMap[$request->final_status] ?? null;
-        if (is_null($finalStatusCode)) {
-            return response()->json(['error' => 'Invalid status code'], 400);
-        }
 
+        // Update the fields
         $call->Final_Status = $finalStatusCode;
         $call->status_update_note = $request->status_note;
         $call->updated_by = $userId;
-        $call->updated_at = now();
+        // updated_at is handled automatically by Laravel, but manual is fine too
 
         $call->save();
 
-        return response()->json(['message' => 'Status updated successfully']);
+        return response()->json(['message' => 'Status updated successfully for Call ID: ' . $call->call_id]);
     } catch (\Exception $ex) {
         return response()->json(['error' => $ex->getMessage()], 500);
     }
 }
-
 
 // You can add more methods below if needed (like search, reports, etc.)
 }
