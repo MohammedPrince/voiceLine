@@ -84,6 +84,122 @@
     .scroll-to-bottom.show {
         opacity: 1;
     }
+
+
+
+
+.profile-card .name {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 8px;
+}
+
+.profile-card .info {
+    font-size: 0.95em;
+    margin-bottom: 5px;
+}
+
+
+.chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 240px; /* Increased slightly for 4 statuses */
+    padding: 10px; /* Added padding so labels don't hit the edges */
+    margin: 0 auto;
+}
+
+
+.profile-card {
+    position: fixed;
+    bottom: 30px;
+    right: 80px;
+    min-width: auto;
+    max-width: 100px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    z-index: 999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    overflow: hidden;
+    transition: max-width 0.5s ease; /* animate max-width */
+    box-sizing: border-box;
+    will-change: max-width;
+}
+
+.profile-card.expanded {
+    max-width: 320px;
+}
+
+/* expanded state: wider */
+.profile-card.expanded {
+    width: 300px; /* expanded width */
+}
+
+/* expandable part */
+.card-expand {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease, opacity 0.3s ease;
+    opacity: 0;
+    margin-top: 10px; /* spacing from header */
+}
+
+/* expanded state */
+.profile-card.expanded .card-expand {
+    max-height: 700px; /* enough to show content */
+    opacity: 1;
+}
+.profile-card .card-header {
+    display: flex;
+    flex-direction: column;  /* stack vertically */
+    align-items: center;     /* center horizontally */
+    gap: 6px;
+}
+
+
+
+.celebration-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.celebration-content {
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    animation: popIn 0.6s ease;
+}
+
+.celebration-icon {
+    font-size: 60px;
+    color: #EC8305;
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0.7);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+.celebration-gif {
+    width: 220px;
+    max-width: 100%;
+    margin-bottom: 10px;
+}
+
+
     </style>
     @stack('styles')
     <!-- Optional page-specific styles -->
@@ -128,6 +244,20 @@
             </div>
         </div>
     </div>
+<div id="celebration-overlay" class="celebration-overlay d-none">
+    <div class="celebration-content text-center">
+   <img 
+    id="celebration-gif"
+    src="" 
+    alt="Celebration"
+    class="celebration-gif"
+/>
+
+
+        <h2 class="mt-3">Congratlations!</h2>
+        <p id="celebration-text"></p>
+    </div>
+</div>
 
 
     <!-- Main Navigation Choices -->
@@ -138,7 +268,50 @@
     </main>
 
 
+@if(!request()->routeIs('login','register'))
 
+<div class="profile-card" id="profileCard">
+
+    <!-- Always visible -->
+    <div class="card-header">
+ <img src="{{ asset('assets/zoom.svg') }}" alt="User Avatar" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;">
+        <!-- <div class="name">Loading user name...</div>
+        <div class="info">User Email: <span>Loading...</span></div> -->
+        <div class="info">Calls <span class="total-calls">Loading...</span></div>
+    </div>
+
+    <!-- Expandable content (MUST be inside) -->
+    <div class="card-expand">
+        <hr>
+
+        <!-- <p><strong>Total Calls:</strong> <span class="total-calls">Loading...</span></p> -->
+      <div class="name">Loading user name...</div>
+        <div class="info">User Email: <span>Loading...</span></div>
+        <p><strong>Today's Calls:</strong> <span class="today-calls">Loading...</span></p>
+
+        <div class="chart-container" style=" margin-top:0px;
+    margin-left:0px;">
+            <canvas id="totalStatusChartProfile" style=" margin-top:0px;
+    margin-left:0px;"></canvas>
+        </div>
+
+        <div class="text-center mt-3">
+            <a href="{{ route('call.archive') }}" class="btn btn-primary btn-sm">
+                View Full Call Archive
+            </a>
+        </div>
+    </div>
+
+</div>
+
+@endif
+
+
+
+
+
+<!-- Global Profile Card -->
+ 
     <!-- Modal -->
    
                 <!-- أزرار التمرير -->
@@ -154,9 +327,15 @@
                 <!-- Scripts -->
                 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
               <script>
            
+
+
                 document.addEventListener('DOMContentLoaded', function() {
                     // عناصر أزرار التمرير
                     const scrollToTopBtn = document.getElementById('scrollToTop');
@@ -198,6 +377,185 @@
                         });
                     });
                 });
+
+
+
+
+
+
+                // --------------------------------------------------------------------
+let chartInitialized = false;
+
+$(document).on('click', '#profileCard', function (e) {
+    if ($(e.target).closest('a, button, canvas').length) return;
+
+    $(this).toggleClass('expanded');
+
+    if ($(this).hasClass('expanded') && !chartInitialized) {
+        chartInitialized = true;
+        loadProfileData(); // ensures chart renders when visible
+    }
+
+    setTimeout(() => {
+        if (window.totalStatusChart) {
+            window.totalStatusChart.resize();
+        }
+    }, 400);
+});
+
+               
+               
+                $(document).ready(function() {
+    const userId = @json(auth()->id());
+window.totalStatusChart = null;
+
+
+   function renderTotalStatusChart(statusCounts) {
+    const canvas = document.getElementById('totalStatusChartProfile');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+
+    if (window.totalStatusChart) {
+        window.totalStatusChart.destroy();
+    }
+
+    window.totalStatusChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            // Added 'Updated' to labels
+            labels: ['Resolved', 'Submitted', 'Escalated', 'Updated'], 
+            datasets: [{
+                data: [
+                    Number(statusCounts.Resolved) || 0,
+                    Number(statusCounts.Submitted) || 0,
+                    Number(statusCounts.Escalated) || 0,
+                    Number(statusCounts.Updated) || 0 // Added Case 4
+                ],
+                // Added a 4th color (Teal/Greenish)
+                backgroundColor: ['#36A2EB', '#FFCE56', '#FF6384', '#4BC0C0'] 
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' },
+                datalabels: {
+                    formatter: (value, ctx) => {
+                        const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                        return total ? ((value / total) * 100).toFixed(1) + '%' : '0%';
+                    },
+                    color: '#fff',
+                    font: { weight: 'bold', size: 12 } // Slightly smaller font for 4 items
+                }
+            }
+        },
+        plugins: window.ChartDataLabels ? [ChartDataLabels] : []
+    });
+}
+
+
+  function calculateStatusCounts(calls) {
+    // Initialize with Updated: 0
+    const counts = { Resolved: 0, Submitted: 0, Escalated: 0, Updated: 0 }; 
+    
+    calls.forEach(call => {
+        const status = call.Final_Status;
+        if (status === 'Resolved' || status === '1') {
+            counts.Resolved++;
+        } else if (status === 'Submitted' || status === '2') {
+            counts.Submitted++;
+        } else if (status === 'Escalated' || status === '3') {
+            counts.Escalated++;
+        } else if (status === 'Updated' || status === '4') { // Added Case 4 logic
+            counts.Updated++;
+        }
+    });
+    return counts;
+}
+
+    // Load profile data
+    function loadProfileData() {
+        $.get(`/profile-data/${userId}`)
+            .done(function(data) {
+                // Update profile card
+                $('.profile-card .name').text(data.user.name);
+                $('.profile-card .info:contains("User Email") span').text(data.user.email);
+                $('.profile-card .info:contains("Received Calls") span').text(`${data.totalCalls} calls`);
+
+                // Update modal info
+                // $('.modal-user-name').text(data.user.name);
+                // $('.modal-user-email').text(data.user.email);
+                $('.total-calls').text(data.totalCalls);
+                $('.today-calls').text(data.todayCalls);
+checkCelebration(data.todayCalls);
+//  checkCelebration(30);
+                // Calculate and render chart
+                const statusCounts = calculateStatusCounts(data.calls || []);
+                renderTotalStatusChart(statusCounts);
+           
+
+            })
+            .fail(function() {
+                alert('Failed to load profile data.');
+            });
+
+
+
+
+    }
+
+    // Load data on page load
+    loadProfileData();
+function checkCelebration(todayCalls) {
+
+    const celebrations = {
+        10: {
+            text: 'You reached 10 calls today! Amazing start 🚀',
+            gif: "{{ asset('assets/got-this.gif') }}"
+        },
+        20: {
+            text: '20 calls completed today! Outstanding work 💪',
+            gif: "{{ asset('assets/yesss.gif') }}"
+        },
+        30: {
+            text: '30 calls today! You are a superstar 🌟',
+            gif: "{{ asset('assets/wow.gif') }}"
+        },
+        40: {
+        text: '40 calls today! Incredible focus and energy 🔥',
+        gif: "{{ asset('assets/min.gif') }}"
+        },
+        50: {
+        text: '50 calls today! Absolute legend status achieved 👑🎉',
+        gif: "{{ asset('assets/champion.gif') }}"
+        }
+
+    };
+
+    if (!celebrations[todayCalls]) return;
+
+    const overlay = document.getElementById('celebration-overlay');
+    const text = document.getElementById('celebration-text');
+    const gif = document.getElementById('celebration-gif');
+
+    // Reset GIF so it replays every time
+    gif.src = '';
+    gif.src = celebrations[todayCalls].gif;
+
+    text.textContent = celebrations[todayCalls].text;
+    overlay.classList.remove('d-none');
+
+    // Auto hide
+    setTimeout(() => {
+        overlay.classList.add('d-none');
+    }, 4000);
+}
+
+
+});
+
                 </script>
    
              

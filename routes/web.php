@@ -137,6 +137,10 @@ Route::get('/test-db/{conn}', function($conn) {
 
 Route::get('/report-data', [ReportController::class, 'getReportData']);
 Route::view('/reports', 'reports.index');
+Route::get('/reports/milestones', function () {
+    return view('reports.milestones');
+})->name('reports.milestones');
+Route::get('/reports/milestones', [ReportController::class, 'milestones']);
 
 /* 
 // Dashboard page (returns blade)
@@ -176,7 +180,8 @@ Route::get('/log-url', function (\Illuminate\Http\Request $request) {
 // routes/web.php
 Route::get('/reports/voice-calls', [ReportController::class, 'voiceCallsReport'])->name('reports.voicecalls');
 Route::post('/reports/voice-calls/search', [ReportController::class, 'search'])->name('reports.voicecalls.search');
-
+Route::post('/reports/calls/update-status', [ReportController::class, 'updateStatus'])
+->name('reports.calls.update-status');
 // added routes for user popup code
 Route::get('/user-profile', [UserProfileController::class, 'dashboard'])->name('user.profile.dashboard');
 Route::get('/profile-data/{userId}', [UserProfileController::class, 'getProfileData'])
@@ -192,3 +197,5 @@ Route::get('/call-archive', [UserProfileController::class, 'callArchive'])->name
 
 Route::post('/calls/update-status', [UserProfileController::class, 'updateStatus'])->name('calls.update-status');
 Route::get('/get-users-list', [App\Http\Controllers\ReportController::class, 'getUsersList']);
+
+

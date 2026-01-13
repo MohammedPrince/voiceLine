@@ -3,6 +3,7 @@
 @section('title', 'Call Archive')
 
 @section('content')
+<div id="mainAlert" class="alert d-none" role="alert"></div>
 <style>
 .table td, .table th {
     padding: 4px 8px !important;
@@ -37,9 +38,18 @@
     color: #6c757d;
     font-size: 0.9rem;
 }
+#mainAlert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 250px;
+    z-index: 1060; /* Higher than bootstrap modal (1055) */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
 </style>
 
 <div class="reports-container mt-4">
+
     <h3 class="mb-3">Call Archive</h3>
 
     <!-- Filter Form -->
@@ -128,7 +138,7 @@
             </button>
         </div>
     </form>
-
+    <div id="globalAlertPlaceholder"></div>
     <!-- Results Table -->
     <table class="table table-bordered" id="resultsTable">
         <thead>
@@ -199,11 +209,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <div id="modalAlertPlaceholder"></div>
+
                 <input type="hidden" id="updateCallId" name="call_id" value="">
                 <input type="hidden" id="updateTicketNumber" name="ticket_number" value="">
 
                 <div class="mb-3">
-                    <label for="finalStatus" class="form-label">Final Status</label>
+                    <label for="finalStatus" class="form-label">Final Status <span class="text-danger">*</span></label>
                     <select id="finalStatus" name="final_status" class="form-select" required>
                         <option value="">Select status</option>
                         <option value="Resolved">Resolved</option>
@@ -213,8 +225,8 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="statusNote" class="form-label">Update Note</label>
-                    <textarea id="statusNote" name="status_note" class="form-control" rows="3" placeholder="Enter update note"></textarea>
+                    <label for="statusNote" class="form-label">Update Note <span class="text-danger">*</span></label>
+                    <textarea id="statusNote" name="status_note" class="form-control" rows="3" placeholder="Enter update note" required></textarea>
                 </div>
             </div>
             <div class="modal-footer">
@@ -529,7 +541,8 @@ $(document).ready(function() {
             method: 'POST',
             data: formData,
             success: function(response) {
-                alert(response.message);
+
+            showAlert(response.message || 'Status updated successfully!', 'success');
                 updateModal.hide();
 
                 // Refresh the table to show updated status
@@ -540,10 +553,27 @@ $(document).ready(function() {
                 if (xhr.responseJSON && xhr.responseJSON.error) {
                     errMsg = xhr.responseJSON.error;
                 }
-                alert(errMsg);
+                  showAlert(errMsg, 'danger');
             }
         });
     });
 });
+
+
+
+// Helper function to show Bootstrap Alerts
+function showAlert(message, type = 'danger') {
+    const alertBox = document.getElementById('mainAlert');
+    if (alertBox) {
+        alertBox.className = `alert alert-${type}`;
+        alertBox.textContent = message;
+        alertBox.classList.remove('d-none');
+
+        // Auto-hide after 3 seconds
+        setTimeout(() => {
+            alertBox.classList.add('d-none');
+        }, 3000);
+    }
+}
 </script>
 @endpush

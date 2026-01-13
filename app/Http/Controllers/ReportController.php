@@ -339,7 +339,7 @@ public function search(Request $request)
     $mappedResults = $results->map(function ($item) use ($categoryMap, $finalStatusMap) {
         return [
             'handled_by'    => $item->handled_by_name ?? 'Not Assigned', // Add this line!
-            // 'call_id'       => $item->call_id,
+            'call_id'       => $item->call_id,
             'ticket_number' => $item->ticket_number,
             'customer_type' => $item->customer_type,
             'parent_name'   => $item->parent_name,
@@ -371,71 +371,104 @@ public function getUsersList()
 }
 
 
-// public function currentUserStatusChart(Request $request)
-// {
-//     $userId = Auth::id();
+public function milestones()
+{
+    $callsPerUser = DB::table('voice_calls as v')
+        ->join('users as u', 'u.id', '=', 'v.handled_by_user_id')
+        ->whereDate('v.created_at', Carbon::today())
+        ->select(
+            'u.name as user_name',
+            DB::raw('COUNT(v.call_id) as total_calls')
+        )
+        ->groupBy('u.name')
+        ->orderByDesc('total_calls')
+        ->get();
 
-//     $query = DB::table('voice_calls')
-//         ->select(
-//             DB::raw("SUM(CASE WHEN Final_Status = '1' THEN 1 ELSE 0 END) AS Resolved"),
-//             DB::raw("SUM(CASE WHEN Final_Status = '2' THEN 1 ELSE 0 END) AS Submitted"),
-//             DB::raw("SUM(CASE WHEN Final_Status = '3' THEN 1 ELSE 0 END) AS Escalated")
-//         )
-//         ->where('handled_by_user_id', $userId);
-
-//     // Optional period filtering
-//     if ($request->filled('period')) {
-//         switch ($request->period) {
-//             case 'today':
-//                 $query->whereDate('created_at', Carbon::today());
-//                 break;
-
-//             case 'week':
-//                 $query->where('created_at', '>=', now()->startOfWeek());
-//                 break;
-
-//             case 'month':
-//                 $query->where('created_at', '>=', now()->startOfMonth());
-//                 break;
-
-//             case 'custom':
-//                 if ($request->from && $request->to) {
-//                     $query->whereBetween('created_at', [
-//                         $request->from . ' 00:00:00',
-//                         $request->to . ' 23:59:59'
-//                     ]);
-//                 }
-//                 break;
-//         }
-//     }
-
-//     $result = $query->first();
-
-//     return response()->json([
-//         'user' => [
-//             'Resolved'  => $result->Resolved ?? 0,
-//             'Submitted' => $result->Submitted ?? 0,
-//             'Escalated' => $result->Escalated ?? 0,
-//         ]
-//     ]);
-// }
+    return view('reports.milestones', compact('callsPerUser'));
+}
 
 
-// public function userCallsDashboard()
-// {
-//     $user = Auth::user();
+// Add this to your ReportsController (or wherever your admin reports are handled)
 
-//     $calls = VoiceCall::where('handled_by_user_id', $user->id)
-//                       ->orderBy('created_at', 'desc')
-//                       ->get();
+public function updateStatus(Request $request)
+{
+    try {
+        $request->validate([
+            'call_id' => 'required|exists:voice_calls,call_id', 
+            'final_status' => 'required|string|in:Resolved,Submitted,Escalated',
+            'status_note' => 'nullable|string',
+        ]);
 
-//     $totalCalls = $calls->count();
+        $adminId = auth()->id();
+        
+        // Optional: Check if user is admin (uncomment if you have role checking)
+        // if (!auth()->user()->is_admin) {
+        //     return response()->json(['error' => 'Unauthorized. Admin access required.'], 403);
+        // }
 
-//     $todayCalls = VoiceCall::where('handled_by_user_id', $user->id)
-//                            ->whereDate('created_at', now()->toDateString())
-//                            ->count();
+        // Find the specific row by its ID
+        $call = VoiceCall::find($request->call_id);
 
-//     return view('dashboard_user', compact('user', 'calls', 'totalCalls', 'todayCalls'));
-// }
+        if (!$call) {
+            return response()->json(['error' => 'Call record not found'], 404);
+        }
+
+        // Admin can update ANY call (no authorization check on handled_by_user_id)
+        // Store who made the update for audit trail
+        
+        $statusMap = [
+            'Resolved' => 4,
+            'Submitted' => 2,
+            'Escalated' => 3,
+        ];
+
+        $finalStatusCode = $statusMap[$request->final_status] ?? null;
+
+        if ($finalStatusCode === null) {
+            return response()->json(['error' => 'Invalid status value'], 400);
+        }
+
+        // Store original status for logging (optional)
+        $originalStatus = $call->Final_Status;
+
+        // Update the fields
+        $call->Final_Status = $finalStatusCode;
+        $call->status_update_note = $request->status_note;
+        $call->updated_by = $adminId; // Track admin who made the change
+        $call->updated_at = now(); // Explicit timestamp
+
+        $call->save();
+
+        // Optional: Log the admin action for audit trail
+        // \Log::info("Admin {$adminId} updated call {$call->call_id} status from {$originalStatus} to {$finalStatusCode}");
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status updated successfully for Call ID: ' . $call->call_id,
+            'data' => [
+                'call_id' => $call->call_id,
+                'ticket_number' => $call->ticket_number,
+                'new_status' => $request->final_status,
+                'updated_by' => $adminId,
+                'updated_at' => $call->updated_at->format('Y-m-d H:i:s')
+            ]
+        ]);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'error' => 'Validation failed',
+            'messages' => $e->errors()
+        ], 422);
+    } catch (\Exception $ex) {
+        // Log the error for debugging
+        \Log::error('Admin update status error: ' . $ex->getMessage());
+        
+        return response()->json([
+            'error' => 'An error occurred while updating status',
+            'message' => $ex->getMessage()
+        ], 500);
+    }
+}
+
 
 }

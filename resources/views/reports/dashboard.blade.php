@@ -11,10 +11,17 @@
     max-width: 300px;
     margin: 0 auto;
 }
-
 canvas {
     max-width: 100%;
     height: 100% !important;
+}
+/* Change this in your style section or add it */
+#rushHourChart {
+    max-width: 100% !important;
+}
+.rush-hour-container {
+    height: 300px;
+    width: 100%;
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -24,7 +31,8 @@ canvas {
     <ul>
         <li><a href="/reports"> General Report </a></li>
         <li><a href="/reports/calls-per-user" class="active">Detailed Report</a></li>
-         <li><a href="/reports/voice-calls">Voice Calls Report</a></li>
+        <li><a href="/reports/voice-calls">Voice Calls Report</a></li>
+        <li><a href="/reports/milestones"> Milestones Report </a></li>
     </ul>
 
     <h5>Calls Per Users Report:</h5>
@@ -48,51 +56,83 @@ canvas {
     </form>
 
     <!-- Charts -->
-<!-- Charts -->
-<div class="mt-4" style="margin-top:-10vh;">
-    <div class="row text-center">
-<div class="col-md-4 mb-4">
-    <div class="chart-container">
-    <canvas id="rushHourChart"></canvas>
-       </div>
-        <p class="chart-label">Rush Hour Report (Time of Day)</p>
-    </div>
-        <div class="col-md-4">
-            <div class="chart-container">
-                <canvas id="circleChart"></canvas>
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-clock me-2"></i>Rush Hour Report (Calls per Hour)</h6>
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px; width: 100%;">
+                        <canvas id="rushHourChart"></canvas>
+                    </div>
+                </div>
             </div>
-            <p>All Calls</p>
         </div>
-        <div class="col-md-4">
-            <div class="chart-container">
-                <canvas id="totalStatusChart"></canvas>
-            </div>
-            <p>Total Calls Status</p>
-        </div>
-     
     </div>
 
-    <div class="row text-center mt-4">
-        <div class="col-md-4">
-            <div class="chart-container">
-                <canvas id="solvedChart"></canvas>
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h6 class="m-0 text-muted text-center">Volume by User (All Calls)</h6>
+                </div>
+                <div class="card-body d-flex flex-column align-items-center">
+                    <div class="chart-container">
+                        <canvas id="circleChart"></canvas>
+                    </div>
+                </div>
             </div>
-            <p>Escalated</p>
         </div>
-      
-          <div class="col-md-4">
-            <div class="chart-container">
-                <canvas id="receivedChart"></canvas>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h6 class="m-0 text-muted text-center">Total Status Distribution</h6>
+                </div>
+                <div class="card-body d-flex flex-column align-items-center">
+                    <div class="chart-container">
+                        <canvas id="totalStatusChart"></canvas>
+                    </div>
+                </div>
             </div>
-            <p>Submitted</p>
         </div>
-          <div class="col-md-4">
-            <div class="chart-container">
-                <canvas id="resolvedChart"></canvas>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card border-left-danger shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1 text-center">Escalated</div>
+                    <div class="chart-container mt-2">
+                        <canvas id="solvedChart"></canvas>
+                    </div>
+                </div>
             </div>
-            <p>Resolved</p>
         </div>
-</div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card border-left-primary shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1 text-center">Submitted</div>
+                    <div class="chart-container mt-2">
+                        <canvas id="receivedChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card border-left-success shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1 text-center">Resolved</div>
+                    <div class="chart-container mt-2">
+                        <canvas id="resolvedChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -306,56 +346,53 @@ totalStatusChart = new Chart(ctxTotalStatus, {
         plugins: [ChartDataLabels]
     });
 }
+
 function renderRushHourChart(rushHourData) {
-    if (!ctxRushHour) return;
+        if (!ctxRushHour) return;
 
-    // Initialize an array with 24 zeros for each hour
-    const hours = Array.from({ length: 24 }, (_, i) => i);
-    const countsByHour = new Array(24).fill(0);
+        const hoursLabels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
+        const countsByHour = new Array(24).fill(0);
 
-    // Fill counts from the data
-    rushHourData.forEach(item => {
-        countsByHour[item.hour] = item.count;
-    });
+        rushHourData.forEach(item => {
+            countsByHour[item.hour] = item.count;
+        });
 
-    if (rushHourChart) {
-        rushHourChart.destroy();
-    }
+        if (rushHourChart) rushHourChart.destroy();
 
-   rushHourChart = new Chart(ctxRushHour, {
-    type: 'doughnut',
-    data: {
-        labels: hours.map(h => `${h}:00`),
-        datasets: [{
-            label: 'Calls per Hour',
-            data: countsByHour,
-            backgroundColor: colors24 // See below for generating colors
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                position: 'right', // Legend on the right for clarity
-                labels: {
-                    boxWidth: 12,
-                    padding: 10,
+        rushHourChart = new Chart(ctxRushHour, {
+            type: 'line',
+            data: {
+                labels: hoursLabels,
+                datasets: [{
+                    label: 'Calls',
+                    data: countsByHour,
+                    borderColor: '#36A2EB',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 2,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } },
+                    x: { grid: { display: false } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    datalabels: {
+                        align: 'top',
+                        display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
+                        font: { weight: 'bold' }
+                    }
                 }
             },
-            datalabels: {
-                color: '#000',
-                formatter: function(value) {
-                    return value > 0 ? value : '';
-                },
-                font: { weight: 'bold' },
-            }
-        }
-    },
-    plugins: [ChartDataLabels]
-});
-
-}
-
+            plugins: [ChartDataLabels]
+        });
+    }
     function loadReport() {
         let period = periodSelect.value;
         let from = document.getElementById("from").value;

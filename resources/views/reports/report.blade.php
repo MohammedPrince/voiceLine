@@ -36,16 +36,17 @@
         transform: translateY(-1px);
     }
 </style>
-<div class="reports-container mt-4">
+<div class="reports-container">
     <ul>
         <li><a href="/reports"> General Report </a></li>
         <li><a href="/reports/calls-per-user">Detailed Report</a></li>
-         <li><a href="/reports/voice-calls" class="active">Voice Calls Report</a></li>
+        <li><a href="/reports/voice-calls" class="active">Voice Calls Report</a></li>
+        <li><a href="/reports/milestones"> Milestones Report </a></li>
     </ul>
 
  
 
-    <h3 class="mb-3">Voice Calls Report</h3>
+    <h5>Voice Calls Report</h5>
 
     <!-- فلترة -->
     <form id="filterForm" class="row g-3 mb-4">
@@ -65,7 +66,13 @@
 
         <div class="col-md-3">
             <label class="form-label">Customer Type</label>
-            <input type="text" name="customer_type" class="form-control" placeholder="Enter customer type">
+             <select name="customer_type" id="customer_type" class="form-select">
+        <option value="" selected>Select Type</option>
+        <option value="Student">Student</option>
+        <option value="Parent">Parent</option>
+        <option value="Staff">Staff</option>
+        <option value="General">General</option>
+    </select>
         </div>
 
         <div class="col-md-3">
@@ -175,7 +182,7 @@
    <table class="table table-bordered" id="resultsTable">
     <thead>
         <tr>
-            <th>Call ID</th>
+            <th>Staff</th>
             <th>Ticket</th>
             <th>Category</th>
             <th>Final Status</th>
@@ -191,6 +198,51 @@
 </nav>
 </div>
 <!-- Modal -->
+<!-- Update Status Modal -->
+<div class="modal fade" id="updateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="updateForm" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Final Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="updateCallId" name="call_id">
+                <input type="hidden" id="updateTicketNumber" name="ticket_number">
+
+                <div class="mb-3">
+                    <label class="form-label">Final Status</label>
+                    <select id="finalStatus" name="final_status" class="form-select" required>
+                        <option value="">Select status</option>
+                        <option value="Resolved">Resolved</option>
+                        <option value="Submitted">Submitted</option>
+                        <option value="Escalated">Escalated</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Update Note</label>
+                    <textarea id="statusNote"
+                              name="status_note"
+                              class="form-control"
+                              rows="3"
+                              placeholder="Enter update note" required></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Save Update</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
 <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -375,9 +427,28 @@ document.addEventListener('click', function(e) {
 });
 
 </script> -->
- <script>
-    document.addEventListener('DOMContentLoaded', function() {
-    fetch('/get-users-list') // Make sure this route exists in web.php
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+// ============================================================================
+// GLOBAL VARIABLES
+// ============================================================================
+let allData = [];
+let currentPage = 1;
+const rowsPerPage = 15;
+
+// ============================================================================
+// BOOTSTRAP MODALS INITIALIZATION
+// ============================================================================
+const detailsModal = new bootstrap.Modal(document.getElementById('detailsModal'));
+const updateModalEl = document.getElementById('updateModal');
+const updateModal = new bootstrap.Modal(updateModalEl);
+
+// ============================================================================
+// PAGE INITIALIZATION
+// ============================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Load users list for filter dropdown
+    fetch('/get-users-list')
         .then(response => response.json())
         .then(data => {
             const userSelect = document.getElementById('userFilter');
@@ -389,12 +460,10 @@ document.addEventListener('click', function(e) {
             });
         });
 });
-// Global Variables
-let allData = []; 
-let currentPage = 1;
-const rowsPerPage = 15;
 
-// Search/Filter Event
+// ============================================================================
+// SEARCH & FILTER FUNCTIONALITY
+// ============================================================================
 document.getElementById("filterBtn").addEventListener("click", function() {
     let tbody = document.querySelector("#resultsTable tbody");
     
@@ -413,8 +482,8 @@ document.getElementById("filterBtn").addEventListener("click", function() {
     })
     .then(res => res.json())
     .then(data => {
-        allData = data; 
-        currentPage = 1; 
+        allData = data;
+        currentPage = 1;
         renderTablePage(currentPage);
     })
     .catch(error => {
@@ -423,7 +492,9 @@ document.getElementById("filterBtn").addEventListener("click", function() {
     });
 });
 
-// Render Function
+// ============================================================================
+// TABLE RENDERING & PAGINATION
+// ============================================================================
 function renderTablePage(page) {
     let tbody = document.querySelector("#resultsTable tbody");
     let paginationContainer = document.getElementById("paginationControls");
@@ -447,14 +518,21 @@ function renderTablePage(page) {
         let fullData = encodeURIComponent(JSON.stringify(row));
         rowsHtml += `
             <tr>
-                <td><span class="fw-bold text-muted">${row.call_id ?? ''}</span></td>
+                <td><span class="fw-bold text-muted">${row.handled_by ?? ''}</span></td>
                 <td>${row.ticket_number ?? ''}</td>
                 <td><small>${row.category ?? ''}</small></td>
                 <td>${getStatusBadge(row.Final_Status)}</td>
                 <td>${row.stud_id ?? ''}</td>
-                <td>
-                    <button class="btn btn-sm btn-info detailsBtn text-white" data-details="${fullData}">
-                        <i class="fas fa-eye me-1"></i> Details
+                <td class="d-flex gap-1">
+                    <button class="btn btn-sm btn-info detailsBtn text-white"
+                        data-details="${fullData}">
+                        <i class="fas fa-eye me-1"></i>
+                    </button>
+                    <button class="btn btn-sm btn-warning updateBtn"
+                        data-call-id="${row.call_id}"
+                        data-ticket="${row.ticket_number}"
+                        data-status="${row.Final_Status}">
+                        <i class="fas fa-edit"></i>
                     </button>
                 </td>
                 <td>
@@ -505,33 +583,6 @@ function renderTablePage(page) {
     }
 }
 
-// Helper: Status Badges
-function getStatusBadge(status) {
-    if (!status) return '<span class="badge bg-secondary">Unknown</span>';
-    const s = status.toLowerCase();
-// 1. Check for "Updated" FIRST (to catch "updated-to-resolved")
-    if (s.includes('updated') || s === '4') {
-        return '<span class="badge bg-warning text-dark"><i class="fas fa-check-circle me-1"></i> Updated</span>';
-    }
-
-    // 2. Check for Resolved
-    if (s.includes('resolved') || s === '1') {
-        return '<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Resolved</span>';
-    }
-
-    // 3. Check for Submitted
-    if (s.includes('submitted') || s === '2') {
-        return '<span class="badge bg-primary"><i class="fas fa-paper-plane me-1"></i> Submitted</span>';
-    }
-
-    // 4. Check for Escalated
-    if (s.includes('escalated') || s === '3') {
-        return '<span class="badge bg-danger"><i class="fas fa-exclamation-triangle me-1"></i> Escalated</span>';
-    }
-
-    return `<span class="badge bg-secondary">${status}</span>`;
-}
-
 // Global Page Switcher
 window.changePage = function(page) {
     currentPage = page;
@@ -539,8 +590,57 @@ window.changePage = function(page) {
     // Smooth scroll back to table top
     document.getElementById('resultsTable').scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
-// Using Bootstrap 5's modal JS
-const detailsModal = new bootstrap.Modal(document.getElementById('detailsModal'));
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+function getStatusBadge(status) {
+    if (!status) return '<span class="badge bg-secondary">Unknown</span>';
+    const s = status.toLowerCase();
+    
+    // Check for "Updated" FIRST (to catch "updated-to-resolved")
+    if (s.includes('updated') || s === '4') {
+        return '<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Updated</span>';
+    }
+
+    // Check for Resolved
+    if (s.includes('resolved') || s === '1') {
+        return '<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Resolved</span>';
+    }
+
+    // Check for Submitted
+    if (s.includes('submitted') || s === '2') {
+        return '<span class="badge bg-primary"><i class="fas fa-paper-plane me-1"></i> Submitted</span>';
+    }
+
+    // Check for Escalated
+    if (s.includes('escalated') || s === '3') {
+        return '<span class="badge bg-danger"><i class="fas fa-exclamation-triangle me-1"></i> Escalated</span>';
+    }
+
+    return `<span class="badge bg-secondary">${status}</span>`;
+}
+
+function showAlert(message, type = 'danger', targetId = 'mainAlert') {
+    const alertBox = document.getElementById(targetId);
+
+    if (alertBox) {
+        alertBox.className = `alert alert-${type}`;
+        alertBox.textContent = message;
+        alertBox.classList.remove('d-none');
+
+        // Only auto-hide if it is NOT the modal alert
+        if (targetId !== 'modalAlert') {
+            setTimeout(() => {
+                alertBox.classList.add('d-none');
+            }, 3000);
+        }
+    }
+}
+
+// ============================================================================
+// DETAILS MODAL FUNCTIONALITY
+// ============================================================================
 const modalDetailsBody = document.getElementById('modalDetailsBody');
 
 document.addEventListener('click', function(e) {
@@ -550,11 +650,12 @@ document.addEventListener('click', function(e) {
         // Clear previous content
         modalDetailsBody.innerHTML = '';
 
-        // Build table rows with all details including those shown in the table
+        // Build table rows with all details
         for (const [key, value] of Object.entries(detailsData)) {
-           // 1. Replace underscores and capitalize each word
-    let label = key.replace(/_/g, ' ')
-                   .replace(/\b\w/g, char => char.toUpperCase());
+            // Replace underscores and capitalize each word
+            let label = key.replace(/_/g, ' ')
+                           .replace(/\b\w/g, char => char.toUpperCase());
+            
             // Rename 'parent_name' to 'Name'
             if (key === 'parent_name') {
                 label = 'Name';
@@ -572,18 +673,22 @@ document.addEventListener('click', function(e) {
         detailsModal.show();
     }
 });
+
+// ============================================================================
+// STUDENT DATA MODAL FUNCTIONALITY
+// ============================================================================
 document.addEventListener('click', function(e) {
     if (e.target && e.target.classList.contains('studentDataBtn')) {
         const studentId = e.target.getAttribute('data-student-id');
         if (!studentId) {
-           showAlert('Student ID not found for this record.', 'warning', 'mainAlert');
-
+            showAlert('Student ID not found for this record.', 'warning', 'mainAlert');
             return;
         }
         // Show the student modal and load data
         openStudentModal(studentId);
     }
 });
+
 function openStudentModal(studentId) {
     const modalEl = document.getElementById('StatusModal');
     const modal = new bootstrap.Modal(modalEl);
@@ -596,7 +701,7 @@ function openStudentModal(studentId) {
 
     modal.show();
 
-    // Fetch student data from your backend API
+    // Fetch student data from backend API
     fetch(`{{ url('/get-student') }}/${studentId}`)
         .then(response => {
             if (!response.ok) throw new Error('Network response was not ok');
@@ -623,32 +728,31 @@ function openStudentModal(studentId) {
             document.getElementById('studentCgpa').textContent = data.student.last_cgpa || 'N/A';
 
             // Populate subjects table
-    // Populate subjects table
-// Populate subjects table
-const subjectsTable = document.getElementById('studentSubjectsTable');
-subjectsTable.innerHTML = '';
+            const subjectsTable = document.getElementById('studentSubjectsTable');
+            subjectsTable.innerHTML = '';
 
-if (data.clearance && data.clearance.length > 0) {
-    const seenSubjectCodes = new Set();
+            if (data.clearance && data.clearance.length > 0) {
+                const seenSubjectCodes = new Set();
 
-    data.clearance.forEach(row => {
-        if (!seenSubjectCodes.has(row.course_code)) {  // Use the correct property for subject code
-            seenSubjectCodes.add(row.course_code);
+                data.clearance.forEach(row => {
+                    if (!seenSubjectCodes.has(row.course_code)) {
+                        seenSubjectCodes.add(row.course_code);
 
-            const tr = `
-                <tr>
-                    <td>${row.semester || ''}</td>
-                    <td>${row.course_code || ''}</td>  <!-- Subject code cell -->
-                    <td>${row.course_name || ''}</td>
-                    <td>${row.clearance_grade || ''}</td>
-                    <td>${row.remark || ''}</td>
-                </tr>`;
-            subjectsTable.insertAdjacentHTML('beforeend', tr);
-        }
-    });
-} else {
-    subjectsTable.innerHTML = `<tr><td colspan="5" class="text-center">No data available</td></tr>`;
-}
+                        const tr = `
+                            <tr>
+                                <td>${row.semester || ''}</td>
+                                <td>${row.course_code || ''}</td>
+                                <td>${row.course_name || ''}</td>
+                                <td>${row.clearance_grade || ''}</td>
+                                <td>${row.remark || ''}</td>
+                            </tr>`;
+                        subjectsTable.insertAdjacentHTML('beforeend', tr);
+                    }
+                });
+            } else {
+                subjectsTable.innerHTML = `<tr><td colspan="5" class="text-center">No data available</td></tr>`;
+            }
+
             // Populate tickets table
             const ticketsTable = document.getElementById('ticketsTable');
             ticketsTable.innerHTML = '';
@@ -674,24 +778,118 @@ if (data.clearance && data.clearance.length > 0) {
             alertBox.classList.remove('d-none');
         });
 }
-function showAlert(message, type = 'danger', targetId = 'mainAlert') {
-    const alertBox = document.getElementById(targetId);
 
-    if (alertBox) {
-        alertBox.className = `alert alert-${type}`;
-        alertBox.textContent = message;
-        alertBox.classList.remove('d-none');
+// ============================================================================
+// UPDATE STATUS MODAL FUNCTIONALITY
+// ============================================================================
 
-        // Only auto-hide if it is NOT the modal alert
-        if (targetId !== 'modalAlert') {
-            setTimeout(() => {
-                alertBox.classList.add('d-none');
-            }, 3000);
-        } 
+// Event Delegation for Update Button
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.updateBtn');
+    if (!btn) return;
+
+    // Populate modal fields
+    document.getElementById('updateCallId').value = btn.dataset.callId || '';
+    document.getElementById('updateTicketNumber').value = btn.dataset.ticket || '';
+    
+    // Set current status in dropdown
+    const currentStatus = btn.dataset.status || '';
+    const statusSelect = document.getElementById('finalStatus');
+    
+    // Map numeric status codes to text values
+    const statusMapping = {
+        '1': 'Resolved',
+        '2': 'Submitted',
+        '3': 'Escalated',
+        '4': 'Resolved' // "updated to resolved"
+    };
+    
+    statusSelect.value = statusMapping[currentStatus] || currentStatus || '';
+    document.getElementById('statusNote').value = '';
+
+    updateModal.show();
+});
+
+// Submit Update Form
+document.getElementById('updateForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const callId = document.getElementById('updateCallId').value;
+    const ticketNumber = document.getElementById('updateTicketNumber').value;
+    const finalStatus = document.getElementById('finalStatus').value;
+    const statusNote = document.getElementById('statusNote').value;
+
+    // Validate required fields
+    if (!callId || !finalStatus) {
+        showAlert('Please fill all required fields', 'warning');
+        return;
     }
-}
 
+    // Disable submit button during request
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Updating...';
 
+    // Send update request
+    fetch('{{ route("reports.calls.update-status") }}', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            call_id: callId,
+            ticket_number: ticketNumber,
+            final_status: finalStatus,
+            status_note: statusNote || '',
+            _token: '{{ csrf_token() }}'
+        })
+    })
+    .then(res => {
+        if (!res.ok) {
+            return res.json().then(err => Promise.reject(err));
+        }
+        return res.json();
+    })
+    .then(data => {
+        if (data.success) {
+            showAlert(data.message || 'Status updated successfully!', 'success');
+            updateModal.hide();
+            
+            // Refresh table to show updated status
+            document.getElementById('filterBtn').click();
+        } else {
+            showAlert(data.error || 'Update failed', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Update error:', error);
+        let errorMsg = 'Failed to update status';
+        
+        if (error.error) {
+            errorMsg = error.error;
+        } else if (error.messages) {
+            // Validation errors
+            errorMsg = Object.values(error.messages).flat().join(', ');
+        } else if (error.message) {
+            errorMsg = error.message;
+        }
+        
+        showAlert(errorMsg, 'danger');
+    })
+    .finally(() => {
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    });
+});
+
+// Reset form when modal is closed
+updateModalEl.addEventListener('hidden.bs.modal', function () {
+    document.getElementById('updateForm').reset();
+});
 </script>
 
-  @endsection
+@endsection

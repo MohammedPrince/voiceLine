@@ -4,19 +4,24 @@
  
 @section('content')
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style src=""></style>
+<style>
+  canvas {
+    top:50px;
+}
+</style>
 
   <div class="reports-container">
     <ul>
       <li><a href="/reports" class="active"> General Report </a></li>
       <li><a href="/reports/calls-per-user">Detailed Report</a></li>
       <li><a href="/reports/voice-calls">Voice Calls Report</a></li>
+        <li><a href="/reports/milestones"> Milestones Report </a></li>
     </ul>
 
     <h5>Reports:</h5>
 
     <!-- فلترة بالمدد -->
-    <div>
+    <div style="margin-bottom:100px;">
       <label for="dateRange" class="form-label">Select Range:</label>
       <select id="dateRange" class="form-select">
         <option value="">-- Select --</option>
@@ -30,7 +35,7 @@
     </div>
 
     <!-- فلترة بتاريخ مخصص -->
-    <div id="customRange" style="display:none;">
+    <div id="customRange" style="display:none;margin-top:-90px;margin-bottom:90px;">
       <label>Start Date:</label>
       <input type="date" id="startDate">
       <label>End Date:</label>
@@ -39,6 +44,7 @@
     </div>
 
     <div class="chart-container">
+      <div></div>
       <canvas id="categoryChart" height="150"></canvas>
     </div>
   </div>
