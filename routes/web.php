@@ -11,9 +11,18 @@ use  App\Http\Controllers\{
 };
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
- use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Log;
 
+//Clear All route
+Route::get('/clear-all', function () {
 
+    Artisan::call('optimize');
+    Artisan::call('route:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+
+    return 'Caching, routes, and configuration cleared successfully.';
+})->name('clear');
 
 
 Route::get('/', function () {
