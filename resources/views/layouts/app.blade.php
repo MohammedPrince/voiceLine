@@ -370,6 +370,7 @@ const userId = @json(auth()->id());
 window.totalStatusChart = null;
 let chartInitialized = false;
 
+
 // Make loadProfileData global so it's accessible everywhere
 function loadProfileData() {
     $.get(`/profile-data/${userId}`)
@@ -399,13 +400,13 @@ function calculateStatusCounts(calls) {
     
     calls.forEach(call => {
         const status = call.Final_Status;
-        if (status === 'Resolved' || status === '1') {
+        if (status === '1') {
             counts.Resolved++;
-        } else if (status === 'Submitted' || status === '2') {
+        } else if (status === '2') {
             counts.Submitted++;
-        } else if (status === 'Escalated' || status === '3') {
+        } else if (status === '3') {
             counts.Escalated++;
-        } else if (status === 'Updated' || status === '4') {
+        } else if (status === '4') {
             counts.Updated++;
         }
     });
