@@ -23,6 +23,15 @@ canvas {
     height: 300px;
     width: 100%;
 }
+#expandChartModal .modal-body {
+    height: calc(100vh - 70px);
+}
+
+#expandChartModal canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
@@ -165,6 +174,21 @@ canvas {
         </tbody>
     </table>
 </div>
+<!-- Expand Chart Modal -->
+<div class="modal fade" id="expandChartModal" tabindex="-1">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="expandChartTitle">Chart</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <canvas id="expandedChartCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 @push('scripts')
 <script>
@@ -224,6 +248,7 @@ const colors24 = Array.from({ length: 24 }, (_, i) =>
 };
 
     let chartAll, chartCompleted, chartResolved, chartScheduled, totalStatusChart, rushHourChart ;
+const chartsMap = {};
 
 function toNumber(val) {
     return Number(val) || 0;
@@ -293,6 +318,7 @@ totalStatusChart = new Chart(ctxTotalStatus, {
     },
     plugins: [ChartDataLabels]
 });
+chartsMap['totalStatusChart'] = totalStatusChart;
 
     chartAll = new Chart(ctxAll, {
         type: 'doughnut',
@@ -306,6 +332,7 @@ totalStatusChart = new Chart(ctxTotalStatus, {
         options: chartOptions,
         plugins: [ChartDataLabels]
     });
+    chartsMap['circleChart'] = chartAll;
 
     chartCompleted = new Chart(ctxReceived, {
         type: 'doughnut',
@@ -319,7 +346,7 @@ totalStatusChart = new Chart(ctxTotalStatus, {
         options: chartOptions,
         plugins: [ChartDataLabels]
     });
-
+chartsMap['receivedChart'] = chartCompleted;
     chartScheduled = new Chart(ctxSolved, {
         type: 'doughnut',
         data: {
@@ -332,7 +359,7 @@ totalStatusChart = new Chart(ctxTotalStatus, {
         options: chartOptions,
         plugins: [ChartDataLabels]
     });
-
+chartsMap['solvedChart'] = chartScheduled;
     chartResolved = new Chart(ctxResolved, {
         type: 'doughnut',
         data: {
@@ -345,6 +372,7 @@ totalStatusChart = new Chart(ctxTotalStatus, {
         options: chartOptions,
         plugins: [ChartDataLabels]
     });
+    chartsMap['resolvedChart'] = chartResolved;
 }
 
 function renderRushHourChart(rushHourData) {
@@ -392,6 +420,7 @@ function renderRushHourChart(rushHourData) {
             },
             plugins: [ChartDataLabels]
         });
+        chartsMap['rushHourChart'] = rushHourChart;
     }
     function loadReport() {
         let period = periodSelect.value;
@@ -444,6 +473,109 @@ function renderRushHourChart(rushHourData) {
 
 
     loadReport();
+let expandedChartInstance = null;
+const expandModalEl = document.getElementById('expandChartModal');
+const expandModal = new bootstrap.Modal(expandModalEl);
+
+document.addEventListener('click', function (e) {
+    const canvas = e.target.closest('canvas:not(#expandedChartCanvas)');
+    if (!canvas || !chartsMap[canvas.id]) return;
+
+    const originalChart = chartsMap[canvas.id];
+
+    const cardTitle =
+        canvas.closest('.card')?.querySelector('.card-header h6')?.textContent
+        || 'Chart Details';
+
+    document.getElementById('expandChartTitle').textContent = cardTitle;
+
+    // Destroy previous chart if exists
+    if (expandedChartInstance) {
+        expandedChartInstance.destroy();
+        expandedChartInstance = null;
+    }
+
+    // Show modal first
+    expandModal.show();
+
+    // Wait for modal to be fully rendered
+    setTimeout(() => {
+        const ctx = document.getElementById('expandedChartCanvas').getContext('2d');
+        
+        // Create new config based on chart type
+        let newConfig = {
+            type: originalChart.config.type,
+            data: {
+                labels: originalChart.data.labels,
+                datasets: originalChart.data.datasets.map(ds => ({
+                    ...ds,
+                    data: [...ds.data]
+                }))
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { size: 14 }
+                        }
+                    },
+                    datalabels: {
+                        color: '#000',
+                        font: {
+                            weight: 'bold',
+                            size: 16
+                        },
+                        formatter: (value, context) => {
+                            const data = context.dataset.data;
+                            const total = data.reduce((a, b) => a + b, 0);
+                            if (!total) return '0%';
+                            return ((value / total) * 100).toFixed(1) + '%';
+                        }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        };
+
+        // Special handling for line chart (rush hour)
+        if (originalChart.config.type === 'line') {
+            newConfig.options.scales = {
+                y: { 
+                    beginAtZero: true, 
+                    ticks: { 
+                        stepSize: 1,
+                        font: { size: 12 }
+                    }
+                },
+                x: { 
+                    grid: { display: false },
+                    ticks: { font: { size: 12 } }
+                }
+            };
+            newConfig.options.plugins.datalabels = {
+                align: 'top',
+                display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
+                font: { weight: 'bold', size: 14 }
+            };
+        }
+        
+        expandedChartInstance = new Chart(ctx, newConfig);
+    }, 150);
 });
+
+// Cleanup when modal closes
+expandModalEl.addEventListener('hidden.bs.modal', function () {
+    if (expandedChartInstance) {
+        expandedChartInstance.destroy();
+        expandedChartInstance = null;
+    }
+});
+});
+
+
+
 </script>
      @endpush

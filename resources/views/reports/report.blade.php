@@ -179,6 +179,10 @@
     </form>
 <div id="mainAlert" class="alert alert-danger d-none" role="alert"></div>
     <!-- جدول النتائج -->
+    
+    <div id="resultsCount" class="text-muted meduim"></div>
+
+
    <table class="table table-bordered" id="resultsTable">
     <thead>
         <tr>
@@ -496,6 +500,8 @@ document.getElementById("filterBtn").addEventListener("click", function() {
 // TABLE RENDERING & PAGINATION
 // ============================================================================
 function renderTablePage(page) {
+const resultsCountEl = document.getElementById('resultsCount');
+
     let tbody = document.querySelector("#resultsTable tbody");
     let paginationContainer = document.getElementById("paginationControls");
     
@@ -504,6 +510,7 @@ function renderTablePage(page) {
 
     if (allData.length === 0) {
         tbody.innerHTML = "<tr><td colspan='7' class='text-center'>No Data Found</td></tr>";
+       resultsCountEl.textContent = "0 results found";
         return;
     }
 
@@ -511,6 +518,7 @@ function renderTablePage(page) {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
     const paginatedItems = allData.slice(start, end);
+resultsCountEl.textContent = `Showing ${allData.length} result${allData.length > 1 ? 's' : ''}`;
 
     // Build Rows
     let rowsHtml = '';
@@ -643,36 +651,34 @@ function showAlert(message, type = 'danger', targetId = 'mainAlert') {
 // ============================================================================
 const modalDetailsBody = document.getElementById('modalDetailsBody');
 
-document.addEventListener('click', function(e) {
-    if (e.target && e.target.classList.contains('detailsBtn')) {
-        const detailsData = JSON.parse(decodeURIComponent(e.target.getAttribute('data-details')));
-        
-        // Clear previous content
-        modalDetailsBody.innerHTML = '';
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.detailsBtn');
+    if (!btn) return;
 
-        // Build table rows with all details
-        for (const [key, value] of Object.entries(detailsData)) {
-            // Replace underscores and capitalize each word
-            let label = key.replace(/_/g, ' ')
-                           .replace(/\b\w/g, char => char.toUpperCase());
-            
-            // Rename 'parent_name' to 'Name'
-            if (key === 'parent_name') {
-                label = 'Name';
-            }
+    const detailsData = JSON.parse(
+        decodeURIComponent(btn.getAttribute('data-details'))
+    );
 
-            modalDetailsBody.innerHTML += `
-                <tr>
-                    <th>${label}</th>
-                    <td>${value ?? ''}</td>
-                </tr>
-            `;
-        }
+    modalDetailsBody.innerHTML = '';
 
-        // Show the modal
-        detailsModal.show();
+    for (const [key, value] of Object.entries(detailsData)) {
+        let label = key.replace(/_/g, ' ')
+                       .replace(/\b\w/g, c => c.toUpperCase());
+
+        if (key === 'parent_name') label = 'Name';
+
+        modalDetailsBody.innerHTML += `
+            <tr>
+                <th>${label}</th>
+                <td>${value ?? ''}</td>
+            </tr>
+        `; 
     }
+
+    detailsModal.show();
 });
+
+
 
 // ============================================================================
 // STUDENT DATA MODAL FUNCTIONALITY

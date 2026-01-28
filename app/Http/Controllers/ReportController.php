@@ -317,7 +317,8 @@ public function search(Request $request)
         'call_id', 'ticket_number', 'customer_type', 'stud_id', 'staff_ID',
         'category', 'issue', 'Solution_Note', 'Found_Status', 'Final_Status',
         'priority', 'parent_id', 'parent_name', 'parent_phone', 'handled_by_user_id'
-    ];
+        ,'status_update_note', 
+        ];
 
     foreach ($searchableFields as $field) {
         if ($request->filled($field)) {
@@ -348,6 +349,8 @@ public function search(Request $request)
             'Final_Status'  => $finalStatusMap[$item->Final_Status] ?? ($item->Final_Status ?? 'Unknown'),
             'created_at'    => $item->created_at ? Carbon::parse($item->created_at)->format('Y-m-d H:i:s') : null,
             'stud_id'       => $item->stud_id,
+            'Solution_Note'      => $item->Solution_Note,
+            'status_update_note'=> $item->status_update_note,
             
         ];
     });

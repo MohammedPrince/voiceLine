@@ -332,85 +332,87 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
-              <script>
-           
+     <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Scroll buttons functionality
+    const scrollToTopBtn = document.getElementById('scrollToTop');
+    const scrollToBottomBtn = document.getElementById('scrollToBottom');
 
-
-                document.addEventListener('DOMContentLoaded', function() {
-                    // عناصر أزرار التمرير
-                    const scrollToTopBtn = document.getElementById('scrollToTop');
-                    const scrollToBottomBtn = document.getElementById('scrollToBottom');
-
-                    // عرض/إخفاء أزرار التمرير بناء على موضع التمرير
-                    window.addEventListener('scroll', function() {
-                        // التمرير إلى الأعلى
-                        if (window.pageYOffset > 300) {
-                            scrollToTopBtn.classList.add('show');
-                        } else {
-                            scrollToTopBtn.classList.remove('show');
-                        }
-
-                        // التمرير إلى الأسفل - إظهار الزر إذا لم نكن في الأسفل
-                        const isAtBottom = window.innerHeight + window.pageYOffset >= document.body
-                            .offsetHeight -
-                            100;
-                        if (!isAtBottom) {
-                            scrollToBottomBtn.classList.add('show');
-                        } else {
-                            scrollToBottomBtn.classList.remove('show');
-                        }
-                    });
-
-                    // التمرير إلى الأعلى عند النقر
-                    scrollToTopBtn.addEventListener('click', function() {
-                        window.scrollTo({
-                            top: 0,
-                            behavior: 'smooth'
-                        });
-                    });
-
-                    // التمرير إلى الأسفل عند النقر
-                    scrollToBottomBtn.addEventListener('click', function() {
-                        window.scrollTo({
-                            top: document.body.scrollHeight,
-                            behavior: 'smooth'
-                        });
-                    });
-                });
-
-
-
-
-
-
-                // --------------------------------------------------------------------
-let chartInitialized = false;
-
-$(document).on('click', '#profileCard', function (e) {
-    if ($(e.target).closest('a, button, canvas').length) return;
-
-    $(this).toggleClass('expanded');
-
-    if ($(this).hasClass('expanded') && !chartInitialized) {
-        chartInitialized = true;
-        loadProfileData(); // ensures chart renders when visible
-    }
-
-    setTimeout(() => {
-        if (window.totalStatusChart) {
-            window.totalStatusChart.resize();
+    window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+            scrollToTopBtn.classList.add('show');
+        } else {
+            scrollToTopBtn.classList.remove('show');
         }
-    }, 400);
+
+        const isAtBottom = window.innerHeight + window.pageYOffset >= document.body.offsetHeight - 100;
+        if (!isAtBottom) {
+            scrollToBottomBtn.classList.add('show');
+        } else {
+            scrollToBottomBtn.classList.remove('show');
+        }
+    });
+
+    scrollToTopBtn.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    scrollToBottomBtn.addEventListener('click', function() {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    });
 });
 
-               
-               
-                $(document).ready(function() {
-    const userId = @json(auth()->id());
+// ============================================================
+// PROFILE CARD & CHART - MOVED OUTSIDE $(document).ready()
+// ============================================================
+
+const userId = @json(auth()->id());
 window.totalStatusChart = null;
+let chartInitialized = false;
 
+// Make loadProfileData global so it's accessible everywhere
+function loadProfileData() {
+    $.get(`/profile-data/${userId}`)
+        .done(function(data) {
+            // Update profile card
+            $('.profile-card .name').text(data.user.name);
+            $('.profile-card .info:contains("User Email") span').text(data.user.email);
+            $('.profile-card .info:contains("Calls") span').text(data.totalCalls);
 
-   function renderTotalStatusChart(statusCounts) {
+            // Update expanded content
+            $('.total-calls').text(data.totalCalls);
+            $('.today-calls').text(data.todayCalls);
+            
+            checkCelebration(data.todayCalls);
+
+            // Calculate and render chart
+            const statusCounts = calculateStatusCounts(data.calls || []);
+            renderTotalStatusChart(statusCounts);
+        })
+        .fail(function() {
+            console.error('Failed to load profile data.');
+        });
+}
+
+function calculateStatusCounts(calls) {
+    const counts = { Resolved: 0, Submitted: 0, Escalated: 0, Updated: 0 }; 
+    
+    calls.forEach(call => {
+        const status = call.Final_Status;
+        if (status === 'Resolved' || status === '1') {
+            counts.Resolved++;
+        } else if (status === 'Submitted' || status === '2') {
+            counts.Submitted++;
+        } else if (status === 'Escalated' || status === '3') {
+            counts.Escalated++;
+        } else if (status === 'Updated' || status === '4') {
+            counts.Updated++;
+        }
+    });
+    return counts;
+}
+
+function renderTotalStatusChart(statusCounts) {
     const canvas = document.getElementById('totalStatusChartProfile');
     if (!canvas) return;
 
@@ -423,16 +425,14 @@ window.totalStatusChart = null;
     window.totalStatusChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            // Added 'Updated' to labels
             labels: ['Resolved', 'Submitted', 'Escalated', 'Updated'], 
             datasets: [{
                 data: [
                     Number(statusCounts.Resolved) || 0,
                     Number(statusCounts.Submitted) || 0,
                     Number(statusCounts.Escalated) || 0,
-                    Number(statusCounts.Updated) || 0 // Added Case 4
+                    Number(statusCounts.Updated) || 0
                 ],
-                // Added a 4th color (Teal/Greenish)
                 backgroundColor: ['#36A2EB', '#FFCE56', '#FF6384', '#4BC0C0'] 
             }]
         },
@@ -447,7 +447,7 @@ window.totalStatusChart = null;
                         return total ? ((value / total) * 100).toFixed(1) + '%' : '0%';
                     },
                     color: '#fff',
-                    font: { weight: 'bold', size: 12 } // Slightly smaller font for 4 items
+                    font: { weight: 'bold', size: 12 }
                 }
             }
         },
@@ -455,61 +455,7 @@ window.totalStatusChart = null;
     });
 }
 
-
-  function calculateStatusCounts(calls) {
-    // Initialize with Updated: 0
-    const counts = { Resolved: 0, Submitted: 0, Escalated: 0, Updated: 0 }; 
-    
-    calls.forEach(call => {
-        const status = call.Final_Status;
-        if (status === 'Resolved' || status === '1') {
-            counts.Resolved++;
-        } else if (status === 'Submitted' || status === '2') {
-            counts.Submitted++;
-        } else if (status === 'Escalated' || status === '3') {
-            counts.Escalated++;
-        } else if (status === 'Updated' || status === '4') { // Added Case 4 logic
-            counts.Updated++;
-        }
-    });
-    return counts;
-}
-
-    // Load profile data
-    function loadProfileData() {
-        $.get(`/profile-data/${userId}`)
-            .done(function(data) {
-                // Update profile card
-                $('.profile-card .name').text(data.user.name);
-                $('.profile-card .info:contains("User Email") span').text(data.user.email);
-                $('.profile-card .info:contains("Received Calls") span').text(`${data.totalCalls} calls`);
-
-                // Update modal info
-                // $('.modal-user-name').text(data.user.name);
-                // $('.modal-user-email').text(data.user.email);
-                $('.total-calls').text(data.totalCalls);
-                $('.today-calls').text(data.todayCalls);
-checkCelebration(data.todayCalls);
-//  checkCelebration(30);
-                // Calculate and render chart
-                const statusCounts = calculateStatusCounts(data.calls || []);
-                renderTotalStatusChart(statusCounts);
-           
-
-            })
-            .fail(function() {
-                alert('Failed to load profile data.');
-            });
-
-
-
-
-    }
-
-    // Load data on page load
-    loadProfileData();
 function checkCelebration(todayCalls) {
-
     const celebrations = {
         10: {
             text: 'You reached 10 calls today! Amazing start 🚀',
@@ -524,14 +470,13 @@ function checkCelebration(todayCalls) {
             gif: "{{ asset('assets/wow.gif') }}"
         },
         40: {
-        text: '40 calls today! Incredible focus and energy 🔥',
-        gif: "{{ asset('assets/min.gif') }}"
+            text: '40 calls today! Incredible focus and energy 🔥',
+            gif: "{{ asset('assets/min.gif') }}"
         },
         50: {
-        text: '50 calls today! Absolute legend status achieved 👑🎉',
-        gif: "{{ asset('assets/champion.gif') }}"
+            text: '50 calls today! Absolute legend status achieved 👑🎉',
+            gif: "{{ asset('assets/champion.gif') }}"
         }
-
     };
 
     if (!celebrations[todayCalls]) return;
@@ -540,23 +485,40 @@ function checkCelebration(todayCalls) {
     const text = document.getElementById('celebration-text');
     const gif = document.getElementById('celebration-gif');
 
-    // Reset GIF so it replays every time
     gif.src = '';
     gif.src = celebrations[todayCalls].gif;
 
     text.textContent = celebrations[todayCalls].text;
     overlay.classList.remove('d-none');
 
-    // Auto hide
     setTimeout(() => {
         overlay.classList.add('d-none');
     }, 4000);
 }
 
+// Profile card click handler
+$(document).on('click', '#profileCard', function (e) {
+    if ($(e.target).closest('a, button, canvas').length) return;
 
+    $(this).toggleClass('expanded');
+
+    if ($(this).hasClass('expanded') && !chartInitialized) {
+        chartInitialized = true;
+        loadProfileData();
+    }
+
+    setTimeout(() => {
+        if (window.totalStatusChart) {
+            window.totalStatusChart.resize();
+        }
+    }, 400);
 });
 
-                </script>
+// Initial load
+$(document).ready(function() {
+    loadProfileData();
+});
+</script>
    
              
 </body>
