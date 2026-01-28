@@ -14,6 +14,7 @@ class UserProfileController extends Controller
     const STATUS_RESOLVED = '1';
     const STATUS_SUBMITTED = '2';
     const STATUS_ESCALATED = '3';
+    const STATUS_UPDATED ='4';
 
     /**
      * Show the dashboard page with initial data.
@@ -112,7 +113,8 @@ class UserProfileController extends Controller
         $statusCountsRaw = VoiceCall::select(
                 DB::raw("SUM(CASE WHEN Final_Status = '" . self::STATUS_RESOLVED . "' THEN 1 ELSE 0 END) as Resolved"),
                 DB::raw("SUM(CASE WHEN Final_Status = '" . self::STATUS_SUBMITTED . "' THEN 1 ELSE 0 END) as Submitted"),
-                DB::raw("SUM(CASE WHEN Final_Status = '" . self::STATUS_ESCALATED . "' THEN 1 ELSE 0 END) as Escalated")
+                DB::raw("SUM(CASE WHEN Final_Status = '" . self::STATUS_ESCALATED . "' THEN 1 ELSE 0 END) as Escalated"),
+                 DB::raw("SUM(CASE WHEN Final_Status = '" . self::STATUS_UPDATED . "' THEN 1 ELSE 0 END) as UPDATED"),
             )
             ->where('handled_by_user_id', $userId)
             ->first();
@@ -121,6 +123,7 @@ class UserProfileController extends Controller
             'Resolved' => $statusCountsRaw->Resolved ?? 0,
             'Submitted' => $statusCountsRaw->Submitted ?? 0,
             'Escalated' => $statusCountsRaw->Escalated ?? 0,
+            'Updated'   => $statusCountsRaw->UPDATED ?? 0,
         ];
 
         return response()->json([

@@ -387,8 +387,8 @@ function loadProfileData() {
             checkCelebration(data.todayCalls);
 
             // Calculate and render chart
-            const statusCounts = calculateStatusCounts(data.calls || []);
-            renderTotalStatusChart(statusCounts);
+            // const statusCounts = calculateStatusCounts(data.calls || []);
+            renderTotalStatusChart(data.statusCounts);
         })
         .fail(function() {
             console.error('Failed to load profile data.');
