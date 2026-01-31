@@ -437,12 +437,12 @@ justify-self:center;
     {{-- Three Download Forms in a Flex Container --}}
   <div class="download-forms-container">
     {{-- 1. Z-Score Adjusted Excel Download --}}
-    <form action="{{ route('marksheet.download') }}" method="POST" id="downloadForm">
+    <!-- <form action="{{ route('marksheet.download') }}" method="POST" id="downloadForm">
         @csrf
         <input type="hidden" name="targetMean" id="downloadTargetMean">
         <input type="hidden" name="targetStdDev" id="downloadTargetStdDev">
         <button type="submit">Download Z-Score Adjusted Excel</button>
-    </form>
+    </form> -->
 
     {{-- 2. Z-Score PDF Download --}}
     <form action="{{ route('marksheet.download-pdf') }}" method="POST" id="downloadPdfForm">
@@ -898,7 +898,7 @@ function updateChartLive() {
 
     // 7. Update A% and F% dynamically based on adjusted totals
     const fCount = adjustedTotals.filter(score => score < 40).length;
-    const aCount = adjustedTotals.filter(score => score >= 90).length;
+    const aCount = adjustedTotals.filter(score => score >= 91).length;
     document.getElementById('fPercent').textContent = ((fCount / totalStudents) * 100).toFixed(1);
     document.getElementById('aPercent').textContent = ((aCount / totalStudents) * 100).toFixed(1);
 }
