@@ -15,6 +15,7 @@ class DashboardRedirectController extends Controller
             return match(auth()->guard()->user()->role){
             User::ROLE_ADMIN      => redirect()->route('admin.dashboard'),
             User::ROLE_SUPERVISOR => redirect()->route('supervisor.dashboard'),
+            User::ROLE_Dean => redirect()->route('dean.dashboard'),
             default               => redirect()->route('user.dashboard'),
 
         };

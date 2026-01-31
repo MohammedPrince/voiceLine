@@ -19,6 +19,7 @@ class User extends Authenticatable
     public const ROLE_ADMIN = 'admin';
     public const ROLE_SUPERVISOR = 'supervisor';
     public const ROLE_USER = 'user';
+    public const ROLE_Dean = 'dean';
 
     protected $fillable = [
         'name', 'email', 'password', 'role',

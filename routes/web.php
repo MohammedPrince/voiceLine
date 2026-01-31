@@ -7,7 +7,9 @@ use  App\Http\Controllers\{
     SupervisorDashboardController,ProfileController,
     UserDashboardController,CallController,ReportController,
     AuthenticatedSessionController,
-    UserProfileController
+    UserProfileController,
+    DeanDashboardController,
+    MarksheetController
 };
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
@@ -62,6 +64,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/supervisor/dashboard', [SupervisorDashboardController::class, 'index'])
         ->middleware('role:supervisor')
         ->name('supervisor.dashboard');
+
+    Route::get('/dean/dashboard', [DeanDashboardController::class, 'index'])
+        ->middleware('role:dean')
+        ->name('dean.dashboard');
 
     Route::get('/user/dashboard', [UserDashboardController::class, 'index'])
         ->middleware('role:user')
@@ -207,4 +213,27 @@ Route::get('/call-archive', [UserProfileController::class, 'callArchive'])->name
 Route::post('/calls/update-status', [UserProfileController::class, 'updateStatus'])->name('calls.update-status');
 Route::get('/get-users-list', [App\Http\Controllers\ReportController::class, 'getUsersList']);
 
+// dean result z score code 
+  // Upload Page
+        Route::get('/upload', [MarksheetController::class, 'index'])
+            ->name('marksheet.index');
 
+        // File Processing
+        Route::post('/upload', [MarksheetController::class, 'upload'])
+            ->name('marksheet.upload');
+
+        Route::get('/upload-marksheet/reset', [MarksheetController::class, 'resetUpload'])
+            ->name('marksheet.reset');
+
+        Route::post('/update-target-values', [MarksheetController::class, 'updateTargetValues'])
+            ->name('update-target-values');
+
+        // Downloads & PDF
+        Route::post('/marksheet/download', [MarksheetController::class, 'download'])
+            ->name('marksheet.download');
+
+        Route::post('/marksheet/download-pdf', [MarksheetController::class, 'downloadPdf'])
+            ->name('marksheet.download-pdf');
+
+        Route::post('/marksheet/download-original', [MarksheetController::class, 'downloadOriginal'])
+            ->name('marksheet.download-original');
