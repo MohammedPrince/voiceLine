@@ -333,6 +333,9 @@ justify-self:center;
     }
 
     </style>
+<link rel="preload" href="{{ asset('assets/logowithname.svg') }}" as="image">
+<link rel="preload" href="{{ asset('assets/bottomleft.svg') }}" as="image">
+<link rel="preload" href="{{ asset('assets/topright.svg') }}" as="image">
 </head>
 
 <body>
