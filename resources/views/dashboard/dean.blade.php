@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+<base href="{{ url('/') }}/">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marksheet Upload & Analysis</title>
  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -333,9 +334,7 @@ justify-self:center;
     }
 
     </style>
-<link rel="preload" href="{{ asset('assets/logowithname.svg') }}" as="image">
-<link rel="preload" href="{{ asset('assets/bottomleft.svg') }}" as="image">
-<link rel="preload" href="{{ asset('assets/topright.svg') }}" as="image">
+
 </head>
 
 <body>
