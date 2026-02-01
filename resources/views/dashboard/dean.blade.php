@@ -5,7 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marksheet Upload & Analysis</title>
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -21,7 +25,7 @@
         justify-content: center;
         margin-bottom: 20px;
         margin-right: 50px;
-
+font-size:20px;
 
         color: #EC8305;
     }
@@ -194,6 +198,65 @@ justify-self:center;
     margin: 0;
 }
 
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropbtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 22px;
+  color: #333;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #fff;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: #333;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  transition: background 0.2s;
+}
+
+.dropdown-content a:hover {
+  background-color: #f5f5f5;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.profile {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+}
+.dropdown-content a:hover {
+    background-color: #f5f5f5 !important;
+    color: #333;
+}
+/* Specific fix for the profile button background */
+.dropbtn, .dropbtn:hover, .dropbtn:focus {
+    background-color: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+
+
+
     .download-forms-container button {
    
         width: 100%; 
@@ -268,22 +331,45 @@ justify-self:center;
             gap: 15px; /* Increase gap between stacked buttons */
         }
     }
+
     </style>
 </head>
 
 <body>
 
-    <picture>
-        <source srcset="{{ asset('assets/logowithname.svg') }}" type="image/svg+xml">
+     <button type="button" onclick="window.location='{{ route('dashboard') }}'"
+        style="background: none; border: none; padding: 0; cursor: pointer;">
         <img src="{{ asset('assets/logowithname.svg') }}" class="logo" alt="logo" draggable="false">
-    </picture>
+    </button>
 
-    <!-- Bottom-left image -->
+
+    <!-- Decorative Images -->
     <img src="{{ asset('assets/bottomleft.svg') }}" class="bottom-left" alt="bottomleft" draggable="false">
-
-    <!-- Top-right image -->
     <img src="{{ asset('assets/topright.svg') }}" class="top-right" alt="topright" draggable="false">
 
+    <!-- User Profile Dropdown -->
+    <div class="profile">
+        <div class="dropdown">
+            <button class="dropbtn">
+                <i class="fa-solid fa-circle-user" style="color: white; font-size: 38px;"></i>
+            </button>
+            <div class="dropdown-content" id="profile-dropdown-content"
+                style="position: absolute; right: 0; min-width: 120px; max-width: 180px;max-hieght">
+                <a class="a" href="{{ url('/profile') }}">Profile</a>
+                <a class="a" href="{{ route('logout') }}"
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    Logout
+                </a>
+
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden"
+                    style="display:none;">
+                    <style></style>
+
+                    @csrf
+                </form>
+            </div>
+        </div>
+    </div>
 
     <h3>📊 Marksheet Upload & Student Analysis</h3>
 <h3 id="filename" > Uploaded File: {{ $fileName ?? 'N/A' }}</h3>
@@ -437,12 +523,12 @@ justify-self:center;
     {{-- Three Download Forms in a Flex Container --}}
   <div class="download-forms-container">
     {{-- 1. Z-Score Adjusted Excel Download --}}
-    <!-- <form action="{{ route('marksheet.download') }}" method="POST" id="downloadForm">
+    <form  style="display: none;" action="{{ route('marksheet.download') }}" method="POST" id="downloadForm">
         @csrf
         <input type="hidden" name="targetMean" id="downloadTargetMean">
         <input type="hidden" name="targetStdDev" id="downloadTargetStdDev">
         <button type="submit">Download Z-Score Adjusted Excel</button>
-    </form> -->
+    </form>
 
     {{-- 2. Z-Score PDF Download --}}
     <form action="{{ route('marksheet.download-pdf') }}" method="POST" id="downloadPdfForm">
@@ -470,8 +556,13 @@ justify-self:center;
    
 
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
     <script>
+    const meanSlider = document.getElementById('targetMeanSlider');
+    const stdSlider = document.getElementById('targetStdSlider');
+    const meanVal = document.getElementById('targetMeanValue');
+    const stdVal = document.getElementById('targetStdValue');
     // --- 1. DATA SETUP ---
     const labels = @json($labels);
     const originalTotals = @json($totals);
@@ -788,10 +879,7 @@ document.getElementById('resetGraphBtn').addEventListener('click', function() {
   
 
 
-    const meanSlider = document.getElementById('targetMeanSlider');
-    const stdSlider = document.getElementById('targetStdSlider');
-    const meanVal = document.getElementById('targetMeanValue');
-    const stdVal = document.getElementById('targetStdValue');
+ 
 
     // Initialize slider ranges and labels
     meanSlider.min = (baseMean - 10).toFixed(1);

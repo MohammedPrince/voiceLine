@@ -66,7 +66,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('supervisor.dashboard');
 
     Route::get('/dean/dashboard', [DeanDashboardController::class, 'index'])
-        ->middleware('role:dean')
+        ->middleware('role:dean|admin')
         ->name('dean.dashboard');
 
     Route::get('/user/dashboard', [UserDashboardController::class, 'index'])

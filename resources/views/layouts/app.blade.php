@@ -267,8 +267,7 @@
         @yield('content')
     </main>
 
-
-@if(!request()->routeIs('login','register'))
+@if(!request()->routeIs('login','register') && auth()->user()->role !== 'dean')
 
 <div class="profile-card" id="profileCard">
 

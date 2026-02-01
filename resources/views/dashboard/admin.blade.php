@@ -12,6 +12,10 @@
     <a class="choice" href="{{ route('student') }}">
         <span>Call Entry</span>
     </a>
+<a class="choice" href="{{ route('dean.dashboard') }}">
+    <span>Results</span>
+</a>
+
 
 
 </div>
