@@ -18,6 +18,15 @@
     <link rel="stylesheet" href="{{ asset('css/login.css') }}">
     
     @stack('styles')
+    <style>
+        /* Hide scroll buttons on screens smaller than 768px */
+@media (max-width: 767px) {
+    #scrollToTop, 
+    #scrollToBottom {
+        display: none !important;
+    }
+}
+    </style>
 </head>
 
 <body>

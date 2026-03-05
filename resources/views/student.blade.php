@@ -3,7 +3,92 @@
 @section('title', 'Call Page')
 
 @section('content')
+<style>
+    @media (max-width: 768px) {
+    /* Hide the table headers */
+    .modal-body table thead {
+        display: none;
+    }
 
+    /* Force table, tbody, tr, and td to behave like blocks */
+    .modal-body table, 
+    .modal-body tbody, 
+    .modal-body tr, 
+    .modal-body td {
+        display: block;
+        width: 100%;
+    }
+
+    .modal-body tr {
+        margin-bottom: 15px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 10px;
+        background: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .modal-body td {
+        display: flex !important;      /* Forces label and icon onto one line */
+        justify-content: flex-start;  /* Keeps them close together */
+        align-items: center;          /* Vertically centers icon with text */
+        gap: 10px;
+        text-align: left;
+        padding: 5px 10px;
+        border: none !important;
+        position: relative;
+    }
+
+    /* Add spacing and styling for specific fields to match your image */
+    .modal-body td:first-child {
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+
+    /* Use data-label for responsiveness */
+    .modal-body td:before {
+        content: attr(data-label);
+        float: left;
+        font-weight: bold;
+        color: #ec8305;
+        margin-right: 10px;
+    }
+
+  
+    
+   
+    /* Icon Button Logic */
+    .modal-body td a.btn-icon-mobile {
+        display: inline-flex; /* Changed from inline-block */
+        align-items: center;
+        justify-content: center;
+        width: 35px;  /* Fixed small width */
+        height: 35px; /* Fixed small height */
+        padding: 0;   /* Remove padding to keep it small */
+        border-radius: 6px;
+        text-decoration: none;
+        transition: transform 0.2s;
+    }
+
+    .modal-body td a.btn-icon-mobile:active {
+        transform: scale(0.9); /* Feedback when tapped */
+    }
+
+    /* Hide text and show only icon */
+    .modal-body td a.btn-icon-mobile span {
+        display: none !important; 
+    }
+     .modal-body td a.btn-icon-mobile i {
+        color: black;
+        display: inline-block !important;
+        font-size: 1rem; /* Slightly smaller icon */
+        margin: 0;
+    }
+
+   
+}
+.modal-body td a i { display: none; }
+</style>
 <div id="mainAlert" class="alert alert-danger d-none" role="alert"></div>
 
 <form action="{{ route('voicecalls.store') }}" method="POST">
@@ -274,7 +359,7 @@
 </form>
 <!---------------------------------------------------staff Modal -->
 <div class="modal fade" id="StaffModal" tabindex="-1" aria-labelledby="StaffModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="StaffModalLabel" style="color: #EC8305;">Staff Info</h5>
@@ -312,7 +397,7 @@
 
 <!----------------------------------------- student Modal --------->
 <div class="modal fade" id="StatusModal" tabindex="-1" aria-labelledby="StatusModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="StatusModalLabel" style="color: #EC8305;">Student Status</h5>
@@ -359,6 +444,7 @@
                         <p><b>F/Z/I Subjects:</b></p>
                     </div>
                     <div class="col-12">
+                        <div class="table-responsive">
                         <table class="table table-bordered table-sm align-middle">
                             <thead class="table-light">
                                 <tr>
@@ -375,6 +461,7 @@
                                 </tr>
                             </tbody>
                         </table>
+</div>
                     </div>
                 </div>
 
@@ -384,6 +471,7 @@
                         <p><b>Tickets:</b></p>
                     </div>
                     <div class="col-12">
+                        <div class="table-responsive">
                         <table class="table table-bordered table-sm align-middle">
                             <thead class="table-light">
                                 <tr>
@@ -400,6 +488,7 @@
                                 </tr>
                             </tbody>
                         </table>
+</div>
                     </div>
                 </div>
 
@@ -615,18 +704,18 @@ document.getElementById('btngetstdrecord').addEventListener('click', function() 
                                     const row = `
                     
                         <tr>
-                            <td>${ticket.trackid || ''}</td>
-                            <td>${ticket.subject || ''}</td>
-                            <td><a href="https://hdesk.fu.edu.sd/admin/admin_ticket.php?track=${ticket.trackid}" target="_blank" >View</a></td>
+                            <td data-label="ID">${ticket.trackid || ''}</td>
+                            <td data-label="Subject">${ticket.subject || ''}</td>
+                            <td data-label="URL"><a href="https://hdesk.fu.edu.sd/admin/admin_ticket.php?track=${ticket.trackid}" target="_blank" class="btn-icon-mobile"><i class="fa-solid fa-eye"></i> <span>View</span></a></td>
                             
-                           <td><a href="javascript:void(0);" data-bs-dismiss="modal" onclick="fillTicketForm('${ticket.trackid}')">Get</a></td>
-                            <td>${ticket.priority || ''}</td>
+                           <td data-label="GET"><a href="javascript:void(0);" data-bs-dismiss="modal" onclick="fillTicketForm('${ticket.trackid}')" class="btn-icon-mobile"><i class="fa-solid fa-download"></i> <span>Get</span></a></td>
+                            <td data-label="Priority">${ticket.priority || ''}</td>
                         </tr>`;
                                     ticketsTable.insertAdjacentHTML('beforeend', row);
                                 });
                             } else {
                                 ticketsTable.innerHTML =
-                                    `<tr><td colspan="4" class="text-center">No tickets found</td></tr>`;
+                                    `<tr data-label="Remark"><td colspan="4" class="text-center">No tickets found</td></tr>`;
                             }
                             // ✅ تفريغ الجدول قبل التحديث
                       // Populate subjects table
@@ -642,11 +731,11 @@ if (data.clearance && data.clearance.length > 0) {
 
             const tr = `
                 <tr>
-                    <td>${row.semester || ''}</td>
-                    <td>${row.course_code || ''}</td>  <!-- Subject code cell -->
-                    <td>${row.course_name || ''}</td>
-                    <td>${row.clearance_grade || ''}</td>
-                    <td>${row.remark || ''}</td>
+                    <td data-label="Semester">${row.semester || ''}</td>
+                    <td data-label="C-Code">${row.course_code || ''}</td>  <!-- Subject code cell -->
+                    <td data-label="C-Name">${row.course_name || ''}</td>
+                    <td data-label="Grade">${row.clearance_grade || ''}</td>
+                    <td data-label="Remark">${row.remark || ''}</td>
                 </tr>`;
             subjectsTable.insertAdjacentHTML('beforeend', tr);
         }

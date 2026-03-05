@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
-<div class="reports-container mt-4">
+<div class="reports-container">
     <ul>
         <li><a href="/reports"> General Report </a></li>
         <li><a href="/reports/calls-per-user" class="active">Detailed Report</a></li>
@@ -207,8 +207,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 position: 'bottom',
                 labels: {
                     font: { size: fontSize },
-                     padding: isMobile ? 6 : 15,   // 👈 increase padding
-                boxWidth: 12,                  // 👈 smaller color boxes
+                     padding: isMobile ? 6 : 15,   
+                boxWidth: 12,                 
                 }
             },
             datalabels: {
