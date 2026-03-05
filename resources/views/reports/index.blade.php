@@ -3,164 +3,189 @@
 @section('title', 'Reports')
  
 @section('content')
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-  canvas {
-    top:50px;
-}
-</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <div class="reports-container">
+
+<div class="reports-container">
     <ul>
-      <li><a href="/reports" class="active"> General Report </a></li>
-      <li><a href="/reports/calls-per-user">Detailed Report</a></li>
-      <li><a href="/reports/voice-calls">Voice Calls Report</a></li>
+        <li><a href="/reports" class="active"> General Report </a></li>
+        <li><a href="/reports/calls-per-user">Detailed Report</a></li>
+        <li><a href="/reports/voice-calls">Voice Calls Report</a></li>
         <li><a href="/reports/milestones"> Milestones Report </a></li>
     </ul>
 
     <h5>Reports:</h5>
 
-    <!-- فلترة بالمدد -->
+    <!-- Filter by Range -->
     <div style="margin-bottom:100px;">
-      <label for="dateRange" class="form-label">Select Range:</label>
-      <select id="dateRange" class="form-select">
-        <option value="">-- Select --</option>
-        <option value="today">Today</option>
-        <option value="last7">Last 7 Days</option>
-        <option value="last30">Last 30 Days</option>
-        <option value="thisMonth">This Month</option>
-        <option value="lastMonth">Last Month</option>
-        <option value="custom">Custom</option>
-      </select>
+        <label for="dateRange" class="form-label">Select Range:</label>
+        <select id="dateRange" class="form-select">
+            <option value="">-- Select --</option>
+            <option value="today">Today</option>
+            <option value="last7">Last 7 Days</option>
+            <option value="last30">Last 30 Days</option>
+            <option value="thisMonth">This Month</option>
+            <option value="lastMonth">Last Month</option>
+            <option value="custom">Custom</option>
+        </select>
     </div>
 
-    <!-- فلترة بتاريخ مخصص -->
+    <!-- Custom Date Range -->
     <div id="customRange" style="display:none;margin-top:-90px;margin-bottom:90px;">
-      <label>Start Date:</label>
-      <input type="date" id="startDate">
-      <label>End Date:</label>
-      <input type="date" id="endDate">
-      <button id="filterBtn">Filter</button>
+        <label>
+            Start Date:
+            <input type="date" id="startDate">
+        </label>
+        <label>
+            End Date:
+            <input type="date" id="endDate">
+        </label>
+        <button id="filterBtn">Filter</button>
     </div>
 
     <div class="chart-container">
-      <div></div>
-      <canvas id="categoryChart" height="150"></canvas>
+        <canvas id="categoryChart" height="150"></canvas>
     </div>
-  </div>
+</div>
 
-  <script>
-     const colorPalette = [
-      '#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF', 
-      '#FF9F40', '#8AC926', '#1982C4', '#6A4C93', '#F15BB5',
-      '#00BBF9', '#00F5D4', '#FB5607', '#8338EC', '#FF006E'
-    ];
+<script>
+const colorPalette = [
+    '#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF', 
+    '#FF9F40', '#8AC926', '#1982C4', '#6A4C93', '#F15BB5',
+    '#00BBF9', '#00F5D4', '#FB5607', '#8338EC', '#FF006E'
+];
 
-    const ctx = document.getElementById('categoryChart').getContext('2d');
-    
-     const categoryChart = new Chart(ctx, {
-      type: 'bar',
-      data: { 
+const ctx = document.getElementById('categoryChart').getContext('2d');
+
+// Determine if mobile
+const isMobile = window.innerWidth < 768;
+const fontSize = isMobile ? 10 : 12;
+const legendFontSize = isMobile ? 9 : 12;
+
+const categoryChart = new Chart(ctx, {
+    type: 'bar',
+    data: { 
         labels: [],  
         datasets: [{
-          label: "Number of Calls",
-          data: [], //   تعبئت   الفئات
-          backgroundColor: []     
+            label: "Number of Calls",
+            data: [],
+            backgroundColor: []     
         }]
-      },
-      options: { 
-        responsive: true, 
+    },
+    options: { 
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: { 
-          legend: { 
-            display: true,
-            position: 'top'
-          } 
+            legend: { 
+                display: true,
+                position: 'top',
+                labels: {
+                    font: { size: legendFontSize },
+                    padding: isMobile ? 8 : 10
+                }
+            } 
         },
         scales: {
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: 'Number of Calls'
+            y: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: 'Number of Calls',
+                    font: { size: fontSize }
+                },
+                ticks: {
+                    font: { size: fontSize }
+                }
+            },
+            x: {
+                title: {
+                    display: true,
+                    text: 'Categories',
+                    font: { size: fontSize }
+                },
+                ticks: {
+                    font: { size: fontSize },
+                    maxRotation: isMobile ? 45 : 0,
+                    minRotation: isMobile ? 45 : 0
+                }
             }
-          },
-          x: {
-            title: {
-              display: true,
-              text: 'Categories'
-            }
-          }
         }
-      }
-    });
+    }
+});
 
-    function loadReport(params = {}) {
+function loadReport(params = {}) {
     let url = "/report-data";
-      const query = new URLSearchParams(params).toString();
-      if (query) url += "?" + query;
+    const query = new URLSearchParams(params).toString();
+    if (query) url += "?" + query;
 
-      console.log("Fetching:", url);
+    console.log("Fetching:", url);
 
-      fetch(url)
+    fetch(url)
         .then(res => res.json())
         .then(data => {
-           
-          categoryChart.data.labels = data.map(item => item.category);
-          categoryChart.data.datasets[0].data = data.map(item => item.total);
-          
-         
-          categoryChart.data.datasets[0].backgroundColor = data.map((item, index) => {
-            return colorPalette[index % colorPalette.length];
-          });
-          
-          categoryChart.update();
+            categoryChart.data.labels = data.map(item => item.category);
+            categoryChart.data.datasets[0].data = data.map(item => item.total);
+            
+            categoryChart.data.datasets[0].backgroundColor = data.map((item, index) => {
+                return colorPalette[index % colorPalette.length];
+            });
+            
+            categoryChart.update();
         })
         .catch(error => {
-          console.error("Error fetching data:", error);
-      
-          const sampleData = [
-            { category: "Category 1", total: 15 },
-            { category: "Category 2", total: 25 },
-            { category: "Category 3", total: 10 },
-            { category: "Category 4", total: 30 },
-            { category: "Category 5", total: 20 }
-          ];
-          
-          categoryChart.data.labels = sampleData.map(item => item.category);
-          categoryChart.data.datasets[0].data = sampleData.map(item => item.total);
-          categoryChart.data.datasets[0].backgroundColor = sampleData.map((item, index) => {
-            return colorPalette[index % colorPalette.length];
-          });
-          categoryChart.update();
+            console.error("Error fetching data:", error);
+            
+            const sampleData = [
+                { category: "Category 1", total: 15 },
+                { category: "Category 2", total: 25 },
+                { category: "Category 3", total: 10 },
+                { category: "Category 4", total: 30 },
+                { category: "Category 5", total: 20 }
+            ];
+            
+            categoryChart.data.labels = sampleData.map(item => item.category);
+            categoryChart.data.datasets[0].data = sampleData.map(item => item.total);
+            categoryChart.data.datasets[0].backgroundColor = sampleData.map((item, index) => {
+                return colorPalette[index % colorPalette.length];
+            });
+            categoryChart.update();
         });
-    }
+}
 
-    document.addEventListener("DOMContentLoaded", function() {
-      const dateRange = document.getElementById("dateRange");
-      const customRange = document.getElementById("customRange");
-      const filterBtn = document.getElementById("filterBtn");
+document.addEventListener("DOMContentLoaded", function() {
+    const dateRange = document.getElementById("dateRange");
+    const customRange = document.getElementById("customRange");
+    const filterBtn = document.getElementById("filterBtn");
 
-      
-      dateRange.addEventListener("change", function() {
+    dateRange.addEventListener("change", function() {
         if (this.value === "custom") {
-          customRange.style.display = "block";
+            customRange.style.display = "block";
         } else {
-          customRange.style.display = "none";
-          if (this.value) loadReport({ period: this.value });
+            customRange.style.display = "none";
+            if (this.value) loadReport({ period: this.value });
         }
-      });
+    });
 
-       filterBtn.addEventListener("click", function() {
+    filterBtn.addEventListener("click", function() {
         const start = document.getElementById("startDate").value;
         const end = document.getElementById("endDate").value;
         if (start && end) {
-          loadReport({ startDate: start, endDate: end });
+            loadReport({ startDate: start, endDate: end });
         } else {
-          alert("Please select both start and end date.");
+            alert("Please select both start and end date.");
         }
-      });
-
-       loadReport();
     });
-  </script>
-  @endsection
+
+    loadReport();
+
+    // Handle window resize
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(function() {
+            categoryChart.resize();
+        }, 250);
+    });
+});
+</script>
+@endsection

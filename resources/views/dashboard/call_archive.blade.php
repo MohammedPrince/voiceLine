@@ -28,6 +28,8 @@
     padding: 10px 15px;
     background-color: #f8f9fa;
     border-top: 1px solid #dee2e6;
+    flex-wrap: wrap;        /* 👈 allow wrapping */
+    gap: 10px;              /* 👈 space between wrapped items */
 }
 
 .pagination {
@@ -46,11 +48,44 @@
     z-index: 1060; /* Higher than bootstrap modal (1055) */
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
+
+@media (max-width: 768px) {
+    .pagination-wrapper {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .pagination .page-link {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+
+    /* Hide middle page numbers on very small screens */
+    @media (max-width: 400px) {
+        .pagination .page-item:not(.active):not(:first-child):not(:last-child) {
+            display: none;
+        }
+    }
+
+    .page-info {
+        order: 1;           /* show count first */
+    }
+
+    nav {
+        order: 2;           /* pagination second */
+    }
+
+    .d-flex.align-items-center.gap-2 {
+        order: 3;           /* rows per page last */
+    }
+}
 </style>
 
 <div class="reports-container mt-4">
 
-    <h3 class="mb-3">Call Archive</h3>
+    <h5>Call Archive</h5>
 
     <!-- Filter Form -->
     <form id="filterForm" class="row g-3 mb-4">
@@ -129,14 +164,14 @@
                 <option value="25">[CESD] Index issuing</option>
             </select>
         </div>
-        <div class="col-12 d-flex justify-content-center gap-2">
-            <button type="button" id="filterBtn" class="btn btn-primary btn-sm" style="max-width:120px;">
-                Search
-            </button>
-            <button type="reset" id="resetBtn" class="btn btn-secondary btn-sm" style="max-width:120px;">
-                Reset
-            </button>
-        </div>
+       <div class="d-flex justify-content-center gap-2">
+    <button type="button" id="filterBtn" class="btn btn-primary btn-sm" style="max-width:120px;">
+        Search
+    </button>
+    <button type="reset" class="btn btn-secondary btn-sm" style="max-width:120px;">
+        Reset
+    </button>
+</div>
     </form>
     <div id="globalAlertPlaceholder"></div>
     <!-- Results Table -->

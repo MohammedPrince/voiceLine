@@ -3,36 +3,8 @@
 @section('title', 'Call Page')
 
 @section('content')
-<style>
-.chart-container {
-    position: relative;
-    height: 300px;
-    width: 100%;
-    max-width: 300px;
-    margin: 0 auto;
-}
-canvas {
-    max-width: 100%;
-    height: 100% !important;
-}
-/* Change this in your style section or add it */
-#rushHourChart {
-    max-width: 100% !important;
-}
-.rush-hour-container {
-    height: 300px;
-    width: 100%;
-}
-#expandChartModal .modal-body {
-    height: calc(100vh - 70px);
-}
 
-#expandChartModal canvas {
-    width: 100% !important;
-    height: 100% !important;
-}
 
-</style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
@@ -65,115 +37,115 @@ canvas {
     </form>
 
     <!-- Charts -->
-<div class="container-fluid mt-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white py-3">
-                    <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-clock me-2"></i>Rush Hour Report (Calls per Hour)</h6>
+    <div class="container-fluid mt-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="chart-wrap-card shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-clock me-2"></i>Rush Hour Report (Calls per Hour)</h6>
+                    </div>
+                    <div class="card-body">
+                        <div style="height: 300px; width: 100%;" class="rush-hour-container">
+                            <canvas id="rushHourChart"></canvas>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div style="height: 300px; width: 100%;">
-                        <canvas id="rushHourChart"></canvas>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="chart-wrap-card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h6 class="m-0 text-muted text-center">Volume by User (All Calls)</h6>
+                    </div>
+                    <div class="card-body d-flex flex-column align-items-center">
+                        <div class="detailed-chart-container">
+                            <canvas id="circleChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="chart-wrap-card shadow-sm ">
+                    <div class="card-header bg-white">
+                        <h6 class="m-0 text-muted text-center">Total Status Distribution</h6>
+                    </div>
+                    <div class="card-body d-flex flex-column align-items-center">
+                        <div class="detailed-chart-container">
+                            <canvas id="totalStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="chart-wrap-card border-left-danger shadow-sm ">
+                    <div class="card-body">
+                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1 text-center">Escalated</div>
+                        <div class="detailed-chart-container">
+                            <canvas id="solvedChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="chart-wrap-card border-left-primary shadow-sm ">
+                    <div class="card-body">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1 text-center">Submitted</div>
+                        <div class="detailed-chart-container">
+                            <canvas id="receivedChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="chart-wrap-card border-left-success shadow-sm ">
+                    <div class="card-body">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1 text-center">Resolved</div>
+                        <div class="detailed-chart-container">
+                            <canvas id="resolvedChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white">
-                    <h6 class="m-0 text-muted text-center">Volume by User (All Calls)</h6>
-                </div>
-                <div class="card-body d-flex flex-column align-items-center">
-                    <div class="chart-container">
-                        <canvas id="circleChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white">
-                    <h6 class="m-0 text-muted text-center">Total Status Distribution</h6>
-                </div>
-                <div class="card-body d-flex flex-column align-items-center">
-                    <div class="chart-container">
-                        <canvas id="totalStatusChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card border-left-danger shadow-sm h-100">
-                <div class="card-body">
-                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1 text-center">Escalated</div>
-                    <div class="chart-container mt-2">
-                        <canvas id="solvedChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="card border-left-primary shadow-sm h-100">
-                <div class="card-body">
-                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1 text-center">Submitted</div>
-                    <div class="chart-container mt-2">
-                        <canvas id="receivedChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="card border-left-success shadow-sm h-100">
-                <div class="card-body">
-                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1 text-center">Resolved</div>
-                    <div class="chart-container mt-2">
-                        <canvas id="resolvedChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
     <!-- Table -->
-    <table id="reportTable" class="table table-striped table-bordered text-center">
-        <thead class="custom-header">
-            <tr>
-                <th>User</th>
-                <th>Received Calls</th>
-                <th>Resolved</th>
-                <th>Submitted</th>
-                <th>Escalated</th>
-                <th>Updated</th>
-
-
-            </tr>
-        </thead>
-        <tbody id='userTableBody'>
-            @foreach($report as $row)
-            <tr>
-                <td>{{ $row->name }}</td>
-                <td>{{ $row->Received_Calls }}</td>
-                <td>{{ $row->Resolved }}</td>
-                <td>{{ $row->Submitted }}</td>
-                <td>{{ $row->Escalated }}</td>
-<td>{{ $row->Updated }}</td>
-
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table id="reportTable" class="table table-striped table-bordered text-center">
+            <thead class="custom-header">
+                <tr>
+                    <th>User</th>
+                    <th>Received Calls</th>
+                    <th>Resolved</th>
+                    <th>Submitted</th>
+                    <th>Escalated</th>
+                    <th>Updated</th>
+                </tr>
+            </thead>
+            <tbody id='userTableBody'>
+                @foreach($report as $row)
+                <tr>
+                    <td>{{ $row->name }}</td>
+                    <td>{{ $row->Received_Calls }}</td>
+                    <td>{{ $row->Resolved }}</td>
+                    <td>{{ $row->Submitted }}</td>
+                    <td>{{ $row->Escalated }}</td>
+                    <td>{{ $row->Updated }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 </div>
+
 <!-- Expand Chart Modal -->
 <div class="modal fade" id="expandChartModal" tabindex="-1">
     <div class="modal-dialog modal-fullscreen">
@@ -190,192 +162,164 @@ canvas {
 </div>
 
 @endsection
+
 @push('scripts')
 <script>
-//     console.log('circleChart:', document.getElementById('circleChart'));
-// console.log('receivedChart:', document.getElementById('receivedChart'));
-// console.log('solvedChart:', document.getElementById('solvedChart'));
-// console.log('resolvedChart:', document.getElementById('resolvedChart'));
-
 document.addEventListener("DOMContentLoaded", function() {
     let periodSelect = document.getElementById("period");
     let customRange = document.getElementById("custom-range");
     let filterBtn = document.getElementById("filterBtn");
 
-  const circleCanvas = document.getElementById('circleChart');
-const receivedCanvas = document.getElementById('receivedChart');
-const solvedCanvas = document.getElementById('solvedChart');
-const resolvedCanvas = document.getElementById('resolvedChart');
-const totalStatusCanvas = document.getElementById('totalStatusChart');
-const rushHourCanvas = document.getElementById('rushHourChart');
-if (!circleCanvas || !receivedCanvas || !solvedCanvas || !resolvedCanvas || !totalStatusCanvas || !rushHourCanvas) {
-    console.error("One or more canvas elements not found");
-    return;
-}
-const ctxTotalStatus = totalStatusCanvas.getContext('2d');
-const ctxAll = circleCanvas.getContext('2d');
-const ctxReceived = receivedCanvas.getContext('2d');
-const ctxSolved = solvedCanvas.getContext('2d');
-const ctxResolved = resolvedCanvas.getContext('2d');
-const ctxRushHour = rushHourCanvas.getContext('2d');
+    const circleCanvas = document.getElementById('circleChart');
+    const receivedCanvas = document.getElementById('receivedChart');
+    const solvedCanvas = document.getElementById('solvedChart');
+    const resolvedCanvas = document.getElementById('resolvedChart');
+    const totalStatusCanvas = document.getElementById('totalStatusChart');
+    const rushHourCanvas = document.getElementById('rushHourChart');
+    
+    if (!circleCanvas || !receivedCanvas || !solvedCanvas || !resolvedCanvas || !totalStatusCanvas || !rushHourCanvas) {
+        console.error("One or more canvas elements not found");
+        return;
+    }
+    
+    const ctxTotalStatus = totalStatusCanvas.getContext('2d');
+    const ctxAll = circleCanvas.getContext('2d');
+    const ctxReceived = receivedCanvas.getContext('2d');
+    const ctxSolved = solvedCanvas.getContext('2d');
+    const ctxResolved = resolvedCanvas.getContext('2d');
+    const ctxRushHour = rushHourCanvas.getContext('2d');
+    
     const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"];
-const colors24 = Array.from({ length: 24 }, (_, i) =>
-    `hsl(${(i * 360) / 24}, 70%, 60%)`
-);
+    const colors24 = Array.from({ length: 24 }, (_, i) =>
+        `hsl(${(i * 360) / 24}, 70%, 60%)`
+    );
+
+    // Determine if mobile
+    const isMobile = window.innerWidth < 768;
+    const fontSize = isMobile ? 9 : 12;
 
     const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: true,
-    aspectRatio: 1, // Makes it square
-    plugins: {
-        legend: {
-            position: 'bottom',
-        },
-        datalabels: {
-            color: '#000',
-            font: {
-                weight: 'bold'
-            },
-            formatter: (value, context) => {
-                const dataset = context.chart.data.datasets[0].data;
-                const total = dataset.reduce((sum, val) => sum + val, 0);
-                if (total === 0) return '0%';
-                const percentage = ((value / total) * 100).toFixed(1);
-                return percentage + "%";
-            }
-        }
-    }
-};
-
-    let chartAll, chartCompleted, chartResolved, chartScheduled, totalStatusChart, rushHourChart ;
-const chartsMap = {};
-
-function toNumber(val) {
-    return Number(val) || 0;
-}
-function renderCharts(users) {
-
-    if (chartAll) chartAll.destroy();
-    if (chartCompleted) chartCompleted.destroy();
-    if (chartScheduled) chartScheduled.destroy();
-    if (chartResolved) chartResolved.destroy();
-const totalResolved = users.reduce(
-    (sum, u) => sum + toNumber(u.Resolved), 0
-);
-
-const totalSubmitted = users.reduce(
-    (sum, u) => sum + toNumber(u.Submitted), 0
-);
-
-const totalEscalated = users.reduce(
-    (sum, u) => sum + toNumber(u.Escalated), 0
-);
-const totalUpdated = users.reduce(
-    (sum, u) => sum + toNumber(u.Updated), 0
-);
-if (totalStatusChart) {
-    totalStatusChart.destroy();
-}
-
-    const labels = users.map(u => u.name);
-totalStatusChart = new Chart(ctxTotalStatus, {
-    type: 'doughnut',
-    data: {
-        labels: ['Resolved', 'Submitted', 'Escalated','Updated'],
-        datasets: [{
-            data: [
-                totalResolved,
-                totalSubmitted,
-                totalEscalated,
-                totalUpdated
-            ],
-            backgroundColor: [
-                '#36A2EB', // Received
-                '#FFCE56', // Submitted
-                '#FF6384',  // Escalated
-                '#4BC0C0'
-            ]
-        }]
-    },
-    options: {
         responsive: true,
+        maintainAspectRatio: true,
+      aspectRatio: 1.3, 
         plugins: {
             legend: {
-                position: 'bottom'
+                position: 'bottom',
+                labels: {
+                    font: { size: fontSize },
+                     padding: isMobile ? 6 : 15,   // 👈 increase padding
+                boxWidth: 12,                  // 👈 smaller color boxes
+                }
             },
             datalabels: {
-                formatter: (value, context) => {
-                    const data = context.dataset.data;
-                    const total = data.reduce((a, b) => a + b, 0);
-                    if (!total) return '0%';
-                    return ((value / total) * 100).toFixed(1) + '%';
-                },
+                color: '#000',
                 font: {
-                    weight: 'bold'
+                    weight: 'bold',
+                    size: fontSize
+                },
+                formatter: (value, context) => {
+                    const dataset = context.chart.data.datasets[0].data;
+                    const total = dataset.reduce((sum, val) => sum + val, 0);
+                    if (total === 0) return '0%';
+                    return ((value / total) * 100).toFixed(1) + '%';
                 }
             }
         }
-    },
-    plugins: [ChartDataLabels]
-});
-chartsMap['totalStatusChart'] = totalStatusChart;
+    };
 
-    chartAll = new Chart(ctxAll, {
-        type: 'doughnut',
-        data: {
-            labels,
-            datasets: [{
-                data: users.map(u => toNumber(u.Received_Calls)),
-                backgroundColor: colors
-            }]
-        },
-        options: chartOptions,
-        plugins: [ChartDataLabels]
-    });
-    chartsMap['circleChart'] = chartAll;
+    let chartAll, chartCompleted, chartScheduled, chartResolved, totalStatusChart, rushHourChart;
+    let chartsMap = {};
 
-    chartCompleted = new Chart(ctxReceived, {
-        type: 'doughnut',
-        data: {
-            labels,
-            datasets: [{
-                data: users.map(u => toNumber(u.Submitted)),
-                backgroundColor: colors
-            }]
-        },
-        options: chartOptions,
-        plugins: [ChartDataLabels]
-    });
-chartsMap['receivedChart'] = chartCompleted;
-    chartScheduled = new Chart(ctxSolved, {
-        type: 'doughnut',
-        data: {
-            labels,
-            datasets: [{
-                data: users.map(u => toNumber(u.Escalated)),
-                backgroundColor: colors
-            }]
-        },
-        options: chartOptions,
-        plugins: [ChartDataLabels]
-    });
-chartsMap['solvedChart'] = chartScheduled;
-    chartResolved = new Chart(ctxResolved, {
-        type: 'doughnut',
-        data: {
-            labels,
-            datasets: [{
-                data: users.map(u => toNumber(u.Resolved)),
-                backgroundColor: colors
-            }]
-        },
-        options: chartOptions,
-        plugins: [ChartDataLabels]
-    });
-    chartsMap['resolvedChart'] = chartResolved;
-}
+    function toNumber(value) {
+        return parseInt(value, 10) || 0;
+    }
 
-function renderRushHourChart(rushHourData) {
+    function renderCharts(users) {
+        const labels = users.map(u => u.name);
+
+        if (chartAll) chartAll.destroy();
+        if (chartCompleted) chartCompleted.destroy();
+        if (chartScheduled) chartScheduled.destroy();
+        if (chartResolved) chartResolved.destroy();
+        if (totalStatusChart) totalStatusChart.destroy();
+
+        totalStatusChart = new Chart(ctxTotalStatus, {
+            type: 'doughnut',
+            data: {
+                labels: ['Resolved', 'Submitted', 'Escalated', 'Updated'],
+                datasets: [{
+                    data: [
+                        users.reduce((sum, u) => sum + toNumber(u.Resolved), 0),
+                        users.reduce((sum, u) => sum + toNumber(u.Submitted), 0),
+                        users.reduce((sum, u) => sum + toNumber(u.Escalated), 0),
+                        users.reduce((sum, u) => sum + toNumber(u.Updated), 0)
+                    ],
+                    backgroundColor: ['#36A2EB', '#FFCE56', '#FF6384', '#4BC0C0']
+                }]
+            },
+            options: chartOptions,
+            plugins: [ChartDataLabels]
+        });
+        chartsMap['totalStatusChart'] = totalStatusChart;
+
+        chartAll = new Chart(ctxAll, {
+            type: 'doughnut',
+            data: {
+                labels,
+                datasets: [{
+                    data: users.map(u => toNumber(u.Received_Calls)),
+                    backgroundColor: colors
+                }]
+            },
+            options: chartOptions,
+            plugins: [ChartDataLabels]
+        });
+        chartsMap['circleChart'] = chartAll;
+
+        chartCompleted = new Chart(ctxReceived, {
+            type: 'doughnut',
+            data: {
+                labels,
+                datasets: [{
+                    data: users.map(u => toNumber(u.Submitted)),
+                    backgroundColor: colors
+                }]
+            },
+            options: chartOptions,
+            plugins: [ChartDataLabels]
+        });
+        chartsMap['receivedChart'] = chartCompleted;
+
+        chartScheduled = new Chart(ctxSolved, {
+            type: 'doughnut',
+            data: {
+                labels,
+                datasets: [{
+                    data: users.map(u => toNumber(u.Escalated)),
+                    backgroundColor: colors
+                }]
+            },
+            options: chartOptions,
+            plugins: [ChartDataLabels]
+        });
+        chartsMap['solvedChart'] = chartScheduled;
+
+        chartResolved = new Chart(ctxResolved, {
+            type: 'doughnut',
+            data: {
+                labels,
+                datasets: [{
+                    data: users.map(u => toNumber(u.Resolved)),
+                    backgroundColor: colors
+                }]
+            },
+            options: chartOptions,
+            plugins: [ChartDataLabels]
+        });
+        chartsMap['resolvedChart'] = chartResolved;
+    }
+
+    function renderRushHourChart(rushHourData) {
         if (!ctxRushHour) return;
 
         const hoursLabels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
@@ -399,22 +343,34 @@ function renderRushHourChart(rushHourData) {
                     fill: true,
                     tension: 0.4,
                     borderWidth: 2,
-                    pointRadius: 4
+                    pointRadius: isMobile ? 3 : 4
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    y: { beginAtZero: true, ticks: { stepSize: 1 } },
-                    x: { grid: { display: false } }
+                    y: { 
+                        beginAtZero: true, 
+                        ticks: { 
+                            stepSize: 1,
+                            font: { size: fontSize }
+                        }
+                    },
+                    x: { 
+                        grid: { display: false },
+                        ticks: { font: { size: fontSize } }
+                    }
                 },
                 plugins: {
                     legend: { display: false },
                     datalabels: {
                         align: 'top',
                         display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
-                        font: { weight: 'bold' }
+                        font: { 
+                            weight: 'bold',
+                            size: fontSize
+                        }
                     }
                 }
             },
@@ -422,12 +378,13 @@ function renderRushHourChart(rushHourData) {
         });
         chartsMap['rushHourChart'] = rushHourChart;
     }
+
     function loadReport() {
         let period = periodSelect.value;
         let from = document.getElementById("from").value;
         let to = document.getElementById("to").value;
 
-      let url = "{{ route('dashboard.data') }}" + "?period=" + period;
+        let url = "{{ route('dashboard.data') }}" + "?period=" + period;
         if (period === "custom") {
             url += "&from=" + from + "&to=" + to;
         }
@@ -435,28 +392,25 @@ function renderRushHourChart(rushHourData) {
         fetch(url)
             .then(response => response.json())
             .then(data => {
-
                 let tbody = document.querySelector("#userTableBody");
-              if (tbody) {
-    tbody.innerHTML = "";
-    data.users.forEach(row => {
-        tbody.innerHTML += `
-            <tr>
-                <td>${row.name}</td>
-                <td>${row.Received_Calls}</td>
-                <td>${row.Resolved}</td>
-                <td>${row.Submitted}</td>
-                <td>${row.Escalated}</td>
-                <td>${row.Updated}</td>
-            </tr>`;
-    });
-}
-         // عشان نغذي او نملى الجارت
+                if (tbody) {
+                    tbody.innerHTML = "";
+                    data.users.forEach(row => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${row.name}</td>
+                                <td>${row.Received_Calls}</td>
+                                <td>${row.Resolved}</td>
+                                <td>${row.Submitted}</td>
+                                <td>${row.Escalated}</td>
+                                <td>${row.Updated}</td>
+                            </tr>`;
+                    });
+                }
                 renderCharts(data.users);
-                 renderRushHourChart(data.rushHour);
+                renderRushHourChart(data.rushHour);
             });
     }
-
 
     periodSelect.addEventListener("change", function() {
         if (this.value === "custom") {
@@ -471,111 +425,108 @@ function renderRushHourChart(rushHourData) {
         loadReport();
     });
 
-
     loadReport();
-let expandedChartInstance = null;
-const expandModalEl = document.getElementById('expandChartModal');
-const expandModal = new bootstrap.Modal(expandModalEl);
 
-document.addEventListener('click', function (e) {
-    const canvas = e.target.closest('canvas:not(#expandedChartCanvas)');
-    if (!canvas || !chartsMap[canvas.id]) return;
+    // Chart expansion functionality
+    let expandedChartInstance = null;
+    const expandModalEl = document.getElementById('expandChartModal');
+    const expandModal = new bootstrap.Modal(expandModalEl);
 
-    const originalChart = chartsMap[canvas.id];
+    document.addEventListener('click', function (e) {
+        const canvas = e.target.closest('canvas:not(#expandedChartCanvas)');
+        if (!canvas || !chartsMap[canvas.id]) return;
 
-    const cardTitle =
-        canvas.closest('.card')?.querySelector('.card-header h6')?.textContent
-        || 'Chart Details';
+        const originalChart = chartsMap[canvas.id];
+        const cardTitle = canvas.closest('.card')?.querySelector('.card-header h6')?.textContent || 'Chart Details';
 
-    document.getElementById('expandChartTitle').textContent = cardTitle;
+        document.getElementById('expandChartTitle').textContent = cardTitle;
 
-    // Destroy previous chart if exists
-    if (expandedChartInstance) {
-        expandedChartInstance.destroy();
-        expandedChartInstance = null;
-    }
+        if (expandedChartInstance) {
+            expandedChartInstance.destroy();
+            expandedChartInstance = null;
+        }
 
-    // Show modal first
-    expandModal.show();
+        expandModal.show();
 
-    // Wait for modal to be fully rendered
-    setTimeout(() => {
-        const ctx = document.getElementById('expandedChartCanvas').getContext('2d');
-        
-        // Create new config based on chart type
-        let newConfig = {
-            type: originalChart.config.type,
-            data: {
-                labels: originalChart.data.labels,
-                datasets: originalChart.data.datasets.map(ds => ({
-                    ...ds,
-                    data: [...ds.data]
-                }))
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            font: { size: 14 }
-                        }
-                    },
-                    datalabels: {
-                        color: '#000',
-                        font: {
-                            weight: 'bold',
-                            size: 16
+        setTimeout(() => {
+            const ctx = document.getElementById('expandedChartCanvas').getContext('2d');
+            
+            let newConfig = {
+                type: originalChart.config.type,
+                data: {
+                    labels: originalChart.data.labels,
+                    datasets: originalChart.data.datasets.map(ds => ({
+                        ...ds,
+                        data: [...ds.data]
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 14 }
+                            }
                         },
-                        formatter: (value, context) => {
-                            const data = context.dataset.data;
-                            const total = data.reduce((a, b) => a + b, 0);
-                            if (!total) return '0%';
-                            return ((value / total) * 100).toFixed(1) + '%';
+                        datalabels: {
+                            color: '#000',
+                            font: {
+                                weight: 'bold',
+                                size: 16
+                            },
+                            formatter: (value, context) => {
+                                const data = context.dataset.data;
+                                const total = data.reduce((a, b) => a + b, 0);
+                                if (!total) return '0%';
+                                return ((value / total) * 100).toFixed(1) + '%';
+                            }
                         }
-                    }
-                }
-            },
-            plugins: [ChartDataLabels]
-        };
-
-        // Special handling for line chart (rush hour)
-        if (originalChart.config.type === 'line') {
-            newConfig.options.scales = {
-                y: { 
-                    beginAtZero: true, 
-                    ticks: { 
-                        stepSize: 1,
-                        font: { size: 12 }
                     }
                 },
-                x: { 
-                    grid: { display: false },
-                    ticks: { font: { size: 12 } }
-                }
+                plugins: [ChartDataLabels]
             };
-            newConfig.options.plugins.datalabels = {
-                align: 'top',
-                display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
-                font: { weight: 'bold', size: 14 }
-            };
+
+            if (originalChart.config.type === 'line') {
+                newConfig.options.scales = {
+                    y: { 
+                        beginAtZero: true, 
+                        ticks: { 
+                            stepSize: 1,
+                            font: { size: 12 }
+                        }
+                    },
+                    x: { 
+                        grid: { display: false },
+                        ticks: { font: { size: 12 } }
+                    }
+                };
+                newConfig.options.plugins.datalabels = {
+                    align: 'top',
+                    display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
+                    font: { weight: 'bold', size: 14 }
+                };
+            }
+            
+            expandedChartInstance = new Chart(ctx, newConfig);
+        }, 150);
+    });
+
+    expandModalEl.addEventListener('hidden.bs.modal', function () {
+        if (expandedChartInstance) {
+            expandedChartInstance.destroy();
+            expandedChartInstance = null;
         }
-        
-        expandedChartInstance = new Chart(ctx, newConfig);
-    }, 150);
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        const newIsMobile = window.innerWidth < 768;
+        if (newIsMobile !== isMobile) {
+            location.reload();
+        }
+    });
 });
-
-// Cleanup when modal closes
-expandModalEl.addEventListener('hidden.bs.modal', function () {
-    if (expandedChartInstance) {
-        expandedChartInstance.destroy();
-        expandedChartInstance = null;
-    }
-});
-});
-
-
-
 </script>
-     @endpush
+@endpush

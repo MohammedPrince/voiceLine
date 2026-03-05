@@ -556,6 +556,7 @@ p b {
   justify-content: center;
   justify-items: center;
   align-items: center;
+  padding: 20px;
 }
 
 .choice {
@@ -563,6 +564,8 @@ p b {
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
+  min-width: 200px;
+  text-align: center;
 }
 
 .choice:hover {
@@ -570,6 +573,61 @@ p b {
   color: white;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
   transform: translateY(-8px);
+}
+
+.choice span {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* Mobile responsive for choices */
+@media (max-width: 576px) {
+  .choices {
+    gap: 20px;
+    padding: 15px 10px;
+  }
+  
+  .choice {
+    padding: 30px 20px;
+    min-width: 150px;
+    width: calc(50% - 10px);
+  }
+  
+  .choice span {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 374px) {
+  .choices {
+    gap: 15px;
+    padding: 10px;
+  }
+  
+  .choice {
+    padding: 25px 15px;
+    min-width: 120px;
+    width: 100%;
+  }
+  
+  .choice span {
+    font-size: 13px;
+  }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+  .choices {
+    gap: 30px;
+  }
+  
+  .choice {
+    padding: 40px 30px;
+    min-width: 180px;
+  }
+  
+  .choice span {
+    font-size: 16px;
+  }
 }
 
 a {
@@ -586,8 +644,9 @@ a {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 22px;
-  color: #333;
+  font-size:30px;
+  color: white;
+  right: 0;
 }
 
 .dropdown-content {
@@ -718,6 +777,7 @@ a {
     width: 60px;
     height: auto;
     left: 5vw;
+    z-index: -1;
   }
 
   .row {
@@ -747,10 +807,17 @@ a {
     width: auto;
   }
 
-  /* Shapes are set to display: none in File 2's media query, which takes precedence. */
-  .bottom-left,
+  /* Decorative images - show but smaller on mobile */
+  .bottom-left {
+    max-width: 80px;
+   bottom: -25vh;
+    left: 0;
+  }
+
   .top-right {
-    display: none;
+    max-width: 80px;
+    top: 0;
+    right: 0;
   }
 
   /* Radio Group/Tabs responsiveness from File 1 */
@@ -765,30 +832,61 @@ a {
   .tabicon {
     display: inline-block;
   }
+}
 
-  /* Keeping the .bottom-left mobile positioning from File 1 for when it might be visible */
-  .bottom-left {
-    bottom: -10vh;
+/* Very small phones */
+@media (max-width: 374px) {
+  .bottom-left,
+  .top-right {
+    max-width: 90px;
+
+  }
+   .bottom-left{
+    bottom: -2vh;
   }
 }
 
-/* ////--------------------reports css/ */
-canvas {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 20px;
-  margin-top: 30px;
-  margin-left: 20px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+/* Landscape mode - hide decorative images */
+@media (max-width: 896px) and (orientation: landscape) {
+  .bottom-left,
+  .top-right {
+    display: none;
+  }
+
 }
 
+/* ////--------------------reports css/ */
+/* REPLACE your current canvas rule with this: */
+canvas:not(.reports-container canvas) {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 0;
+    margin-top: 0;
+    margin-left: 0;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ADD this to strip all decoration from report canvases: */
+.reports-container canvas {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+/* ADD THIS after the canvas rule: */
+#categoryChart {
+  margin-top: 30px;
+  margin-left: 20px;
+}
 #circleChart,
 #solvedChart,
 #receivedChart {
   margin: auto;
   display: block;
-  margin: 40px auto;
+ 
   max-width: 300px;
   position: relative;
   z-index: 10;
@@ -953,15 +1051,25 @@ input[type="date"] {
 /* card code */
 .profile-card {
   position: fixed;
-  bottom: 20px;
+  bottom: 30px;
   right: 30px;
-  width: 300px;
+  min-width: 100px;
+  max-width: 100px;
   background: #fff;
   border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  padding: 16px;
   cursor: pointer;
-  z-index: 1000;
+  z-index: 999;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  transition: max-width 0.5s ease, max-height 0.5s ease;
+  box-sizing: border-box;
+}
+
+.profile-card.expanded {
+  max-width: 320px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .profile-card .profile-img {
@@ -984,6 +1092,33 @@ input[type="date"] {
   object-fit: cover;
 }
 
+.profile-card .card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.profile-card .card-header img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.card-expand {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, opacity 0.3s ease;
+  opacity: 0;
+  margin-top: 10px;
+}
+
+.profile-card.expanded .card-expand {
+  max-height: 800px;
+  opacity: 1;
+}
+
 .profile-card .name {
   font-size: 22px;
   font-weight: bold;
@@ -1001,6 +1136,89 @@ input[type="date"] {
   color: #000;
 }
 
+.chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 240px;
+  padding: 10px;
+  margin: 10px auto;
+}
+
+/* Scroll buttons */
+.scroll-to-top,
+.scroll-to-bottom {
+  position: fixed;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #EC8305;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  border: none;
+}
+
+.scroll-to-top {
+  bottom: 30px;
+}
+
+.scroll-to-bottom {
+  bottom: 90px;
+}
+
+.scroll-to-top.show,
+.scroll-to-bottom.show {
+  opacity: 1;
+}
+
+/* Celebration overlay */
+.celebration-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.celebration-content {
+  background: #fff;
+  padding: 30px 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  animation: popIn 0.6s ease;
+  max-width: 90%;
+  text-align: center;
+}
+
+.celebration-gif {
+  width: 220px;
+  max-width: 100%;
+  margin-bottom: 10px;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 #callsChart {
   width: 100% !important;
   height: 280px !important;
@@ -1014,14 +1232,6 @@ input[type="date"] {
   --accent: #3b82f6;
 }
 
-.card {
-  width: 100%;
-  max-width: 900px;
-  background: var(--card);
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
-  padding: 20px;
-}
 
 h1 {
   margin: 0 0 8px 0;
@@ -1095,3 +1305,398 @@ input[type="file"] {
       font-size: 80px;
       color: #6b4226;
     }
+
+
+/* reports responsiveness */
+/* ============================================================
+   REPORTS – SHARED NAVIGATION
+   Applies to all 4 report pages
+   ============================================================ */
+/* UPDATE this in app.css: */
+.chart-wrap-card {
+    width: 100%;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.12);
+    border: 1px solid #e9ecef;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;       /* allow content to show */
+    height: auto;            /* no fixed height */
+}
+
+.row.mb-4 {
+    display: flex;
+    align-items: stretch;
+}
+
+.row.mb-4 > [class*="col-"] {
+    display: flex;
+    flex-direction: column;
+}
+
+.row.mb-4 .chart-wrap-card {
+    flex: 1;                 /* fills full column height */
+}
+
+.chart-wrap-card .card-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+}
+/* Make chart-wrap-card support Bootstrap's card-header and card-body */
+.chart-wrap-card .card-header {
+    padding: 12px 16px;
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+/* Also remove max-width: 900px — it was limiting the card width */
+body { overflow-x: hidden; }
+.reports-container { padding: 0 10px; }
+/* Desktop (992px+) */
+@media (min-width: 992px) {
+    .reports-container ul {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        list-style: none;
+        padding: 0;
+       margin: 20px auto 30px auto;
+        width: 60%;              /* controls overall width — change to 50% or 70% as needed */
+    }
+
+    .reports-container ul li { flex: 1; }
+
+    .reports-container ul li a {
+        display: block;
+        padding: 8px 12px;       /* reduced from 12px 20px */
+        background: white;
+        border-radius: 8px;
+        text-align: center;
+        text-decoration: none;
+        color: rgb(54, 53, 53);
+        font-size: 13px;         /* reduced from default ~16px */
+        transition: all 0.2s ease;
+    }
+
+    .reports-container ul li a.active { background: #ec8305; color: white; }
+    .reports-container ul li a:hover:not(.active) { background: #ec8305; color: white;  }
+    .reports-container h5 { font-size: 20px; margin: 20px 0; }
+}
+/* Tablet (577px–991px) */
+@media (min-width: 577px) and (max-width: 991px) {
+    .reports-container ul {
+        display: flex; flex-wrap: wrap; justify-content: center;
+        gap: 8px; list-style: none; padding: 10px 0; margin-bottom: 20px;
+    }
+    .reports-container ul li { flex: 1; min-width: 150px; }
+    .reports-container ul li a {
+        display: block; padding: 12px 15px;  background: white;
+        border-radius: 8px; text-align: center; font-size: 14px;
+        text-decoration: none; color: #495057; transition: all 0.2s ease;
+    }
+    .reports-container ul li a.active { background: #ec8305; color: white; font-weight: 600; }
+  .reports-container ul li a:hover:not(.active) { background: #ec8305; color: white;  }
+}
+
+/* Mobile (max 768px) */
+@media (max-width: 768px) {
+    .reports-container ul {
+        display: flex; flex-direction: column; gap: 8px;
+        padding: 10px 0; margin-bottom: 20px; list-style: none;
+    }
+    .reports-container ul li { width: 100%; }
+    .reports-container ul li a {
+        display: block; padding: 12px 15px; background: white;
+        border-radius: 8px; text-align: center; font-size: 14px;
+        text-decoration: none; color: #495057; transition: all 0.2s ease;
+    }
+    .reports-container ul li a.active { background: #ec8305; color: white; font-weight: 600; }
+   .reports-container ul li a:hover:not(.active) { background: #ec8305; color: white; }
+    .reports-container h5 { font-size: 18px; margin: 15px 0; font-weight: 600; }
+}
+
+/* Touch devices */
+@media (hover: none) and (pointer: coarse) {
+    .reports-container ul li a {
+        min-height: 44px; display: flex;
+        align-items: center; justify-content: center;
+    }
+    * { -webkit-tap-highlight-color: transparent; }
+}
+
+
+/* ============================================================
+   GENERAL REPORT (reports/index)
+   ============================================================ */
+
+.reports-container canvas { top: 50px; }
+
+.chart-container {
+    position: relative; width: 100%;
+    max-width: 800px; margin: 0 auto; padding: 20px 10px;
+}
+
+@media (max-width: 768px) {
+    .reports-container > div { margin-bottom: 80px !important; }
+    .form-label { font-size: 14px; font-weight: 600; margin-bottom: 8px; display: block; }
+    .form-select {
+        width: 100%; padding: 10px 12px; font-size: 14px;
+        border: 1px solid #ced4da; border-radius: 6px; margin-bottom: 15px;
+    }
+    #customRange { margin-top: -70px !important; margin-bottom: 80px !important; }
+    #customRange label { font-size: 13px; font-weight: 600; margin-top: 10px; margin-bottom: 5px; display: block; }
+    #customRange input[type="date"] {
+        width: 100%; padding: 10px 12px; font-size: 14px;
+        border: 1px solid #ced4da; border-radius: 6px; margin-bottom: 12px;
+    }
+    #customRange button {
+        width: 100%; padding: 10px; font-size: 14px; background: #ec8305;
+        color: white; border: none; border-radius: 6px; cursor: pointer;
+        font-weight: 600; transition: background 0.2s ease;
+    }
+    #customRange button:hover { background: #d07004; }
+    #customRange button:active { transform: scale(0.98); }
+    .chart-container { padding: 15px 5px; height: auto; min-height: 300px; }
+    #categoryChart { max-height: 350px !important; }
+}
+
+@media (max-width: 374px) {
+    .form-select, #customRange input[type="date"], #customRange button { font-size: 13px; padding: 8px 10px; }
+    .chart-container { min-height: 250px; }
+    #categoryChart { max-height: 300px !important; }
+}
+
+@media (min-width: 375px) and (max-width: 576px) {
+    .chart-container { min-height: 300px; }
+}
+
+@media (min-width: 577px) and (max-width: 991px) {
+    #customRange { display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end; }
+    #customRange label { flex: 1; min-width: 200px; }
+    #customRange button { width: auto; padding: 10px 30px; }
+    .chart-container { min-height: 350px; }
+}
+
+@media (min-width: 992px) {
+    #customRange { display: flex; gap: 15px; align-items: flex-end; }
+    #customRange label { flex: 1; max-width: 300px; }
+    #customRange button { width: auto; padding: 10px 30px; }
+    .chart-container { min-height: 400px; }
+}
+
+@media (hover: none) and (pointer: coarse) {
+    #customRange button, .form-select, #customRange input[type="date"] { min-height: 44px; }
+}
+
+@media (max-width: 896px) and (orientation: landscape) {
+    .chart-container { min-height: 250px; }
+    #categoryChart { max-height: 300px !important; }
+}
+
+
+/* ============================================================
+   DETAILED REPORT (reports/calls-per-user)
+   ============================================================ */
+.detailed-chart-container {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+      margin-top: 0 !important;
+    /* Remove ALL height constraints */
+}
+
+.detailed-chart-container canvas {
+    max-width: 100%;
+    width: 100% !important;
+    height: auto !important;
+}
+
+#rushHourChart { max-width: 100% !important; }
+.rush-hour-container { height: 300px; width: 100%; }
+#expandChartModal .modal-body { height: calc(100vh - 70px); }
+#expandChartModal canvas { width: 100% !important; height: 100% !important; }
+
+@media (max-width: 768px) {
+    #filterForm { margin-top: 0 !important; margin-bottom: 20px; }
+    #filterForm label { font-size: 14px; font-weight: 600; margin-bottom: 5px; display: block; }
+    #filterForm select, #filterForm input {
+        width: 100%; padding: 10px 12px; font-size: 14px;
+        border: 1px solid #ced4da; border-radius: 6px; margin-bottom: 12px;
+    }
+    #custom-range { margin-top: 10px !important; }
+    #custom-range input[type="date"] { margin-bottom: 10px; }
+    #filterBtn { width: 100%; padding: 10px; font-size: 14px; border-radius: 6px; }
+    .card { margin-bottom: 20px; border-radius: 10px; }
+    .card-header { padding: 12px 15px; border-radius: 10px 10px 0 0 !important; }
+    .card-header h6 { font-size: 14px !important; margin: 0; }
+    .card-body { padding: 15px; }
+    .rush-hour-container { height: 220px; }
+    .detailed-chart-container { height: 220px; max-width: 220px; }
+    .row.mb-4 { margin-bottom: 20px !important; }
+    .col-md-6, .col-md-4 { margin-bottom: 15px; }
+    .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    #reportTable { font-size: 12px; min-width: 600px; }
+    #reportTable th, #reportTable td { padding: 8px 6px; white-space: nowrap; }
+    #reportTable thead th { font-size: 11px; font-weight: 600; }
+    #expandChartModal .modal-body { height: calc(100vh - 120px); padding: 15px; }
+    .modal-header { padding: 12px 15px; }
+    .modal-title { font-size: 16px; }
+}
+
+@media (max-width: 374px) {
+    .card-header h6 { font-size: 13px !important; }
+    .detailed-chart-container { height: 180px; max-width: 180px; }
+    .rush-hour-container { height: 200px; }
+    #reportTable { font-size: 11px; }
+}
+
+@media (min-width: 577px) and (max-width: 991px) {
+    .detailed-chart-container { height: 250px; max-width: 250px; }
+    .rush-hour-container { height: 280px; }
+    #reportTable { font-size: 13px; }
+}
+
+@media (min-width: 992px) {
+    .detailed-chart-container { height: 300px; max-width: 300px; }
+    .rush-hour-container { height: 300px; }
+}
+
+@media (hover: none) and (pointer: coarse) {
+    #filterBtn { min-height: 44px; }
+}
+
+@media (max-width: 896px) and (orientation: landscape) {
+    .detailed-chart-container { height: 180px; max-width: 200px; }
+    .rush-hour-container { height: 200px; }
+    .row.mb-4 { margin-bottom: 15px !important; }
+}
+
+
+/* ============================================================
+   MILESTONES REPORT (reports/milestones)
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .milestones-table { display: block; width: 100%; border: none; }
+    .milestones-table thead { display: none; }
+    .milestones-table tbody { display: block; }
+    .milestones-table tbody tr {
+        display: block; margin-bottom: 15px; border: 1px solid #dee2e6;
+        border-radius: 10px; padding: 15px; background: #fff;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .milestones-table tbody tr:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+    .milestones-table tbody td {
+        display: block; text-align: left !important; padding: 10px 0;
+        border: none; position: relative; padding-left: 50%; font-size: 14px;
+    }
+    .milestones-table tbody td:before {
+        content: attr(data-label); position: absolute; left: 0; width: 45%;
+        padding-right: 10px; font-weight: 600; color: #495057; font-size: 13px; text-align: left;
+    }
+    .milestones-table tbody td .badge { display: inline-block; padding: 6px 12px; font-size: 13px; font-weight: 600; border-radius: 6px; }
+    .milestones-table tbody tr td.text-muted { text-align: center !important; padding: 20px; font-size: 14px; padding-left: 0; }
+    .milestones-table tbody tr td.text-muted:before { display: none; }
+}
+
+@media (max-width: 374px) {
+    .milestones-table tbody tr { padding: 12px; }
+    .milestones-table tbody td { font-size: 13px; padding-left: 48%; }
+    .milestones-table tbody td:before { font-size: 12px; width: 43%; }
+    .milestones-table tbody td .badge { font-size: 12px; padding: 5px 10px; }
+}
+
+@media (min-width: 577px) and (max-width: 991px) {
+    .milestones-table tbody tr { padding: 18px; }
+    .milestones-table tbody td { font-size: 15px; }
+}
+
+@media (min-width: 992px) {
+    .milestones-table { display: table; }
+    .milestones-table thead { display: table-header-group; }
+    .milestones-table tbody { display: table-row-group; }
+    .milestones-table tbody tr { display: table-row; border: none; padding: 0; box-shadow: none; }
+    .milestones-table tbody tr:hover { background-color: #f8f9fa; transform: none; }
+    .milestones-table tbody td { display: table-cell; padding: 12px !important; text-align: center !important; }
+    .milestones-table tbody td:before { display: none; }
+    .milestones-table thead th { background-color: #f8f9fa; font-weight: 600; padding: 12px; border-bottom: 2px solid #dee2e6; }
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .milestones-table tbody tr { min-height: 44px; }
+}
+
+
+/* ============================================================
+   VOICE CALLS REPORT (reports/voicecalls)
+   ============================================================ */
+
+#mainAlert {
+    position: fixed; top: 20px; right: 20px;
+    min-width: 250px; z-index: 1055; box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.pagination .page-link { color: #ec8305; border: 1px solid #dee2e6; margin: 0 2px; border-radius: 4px; transition: all 0.2s ease; }
+.pagination .page-item.active .page-link { color: white; background-color: #ec8305; border-color: #ec8305; box-shadow: 0 4px 6px rgba(236,131,5,0.3); }
+.pagination .page-link:hover { background-color: #f8f9fa; transform: translateY(-1px); }
+
+@media (max-width: 768px) {
+    #filterForm .col-md-3 { flex: 0 0 100%; max-width: 100%; margin-bottom: 10px; }
+    #filterForm .form-label { font-size: 13px; font-weight: 600; margin-bottom: 5px; }
+    #filterForm .form-control, #filterForm .form-select { font-size: 14px; padding: 8px 12px; }
+    #filterForm .col-12.d-flex { flex-direction: row !important; gap: 10px; }
+    #filterForm button { flex: 1; max-width: none !important; }
+    #mainAlert { right: 10px; left: 10px; min-width: auto; font-size: 14px; }
+    #resultsCount { font-size: 13px; margin-bottom: 10px; }
+
+    #resultsTable { display: block; width: 100%; }
+    #resultsTable thead { display: none; }
+    #resultsTable tbody { display: block; }
+    #resultsTable tbody tr {
+        display: block; margin-bottom: 15px; border: 1px solid #dee2e6;
+        border-radius: 8px; padding: 12px; background: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    #resultsTable tbody td { display: block; text-align: left !important; padding: 8px 0; border: none; position: relative; padding-left: 45%; }
+    #resultsTable tbody td:before { content: attr(data-label); position: absolute; left: 0; width: 40%; padding-right: 10px; font-weight: 600; color: #495057; font-size: 13px; }
+    #resultsTable tbody td.d-flex { display: flex !important; padding-left: 45%; }
+    #resultsTable tbody td .btn-sm { font-size: 12px; padding: 5px 10px; }
+
+    .pagination { flex-wrap: wrap; gap: 4px; justify-content: center; }
+    .pagination .page-item { margin: 2px; }
+    .pagination .page-link { padding: 6px 10px; font-size: 13px; }
+
+    .modal-dialog { margin: 10px; max-width: calc(100% - 20px); }
+    .modal-body { padding: 15px; }
+    .modal-body table { font-size: 13px; }
+    .modal-body table th, .modal-body table td { padding: 6px; }
+    #StatusModal .table-responsive { overflow-x: auto; }
+    #StatusModal table { font-size: 12px; min-width: 500px; }
+    .modal-body .form-label { font-size: 13px; }
+    .modal-body .form-control, .modal-body .form-select { font-size: 14px; }
+}
+
+@media (max-width: 400px) {
+    .pagination .page-item:not(.active):not(:first-child):not(:last-child):not(:nth-child(2)):not(:nth-last-child(2)) { display: none; }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    #filterForm .col-md-3 { flex: 0 0 50%; max-width: 50%; }
+    #resultsTable { font-size: 14px; }
+    #resultsTable th, #resultsTable td { padding: 8px; }
+}
+
+@media (min-width: 992px) {
+    #resultsTable tbody td:before { display: none; }
+}
+
+@media (hover: none) and (pointer: coarse) {
+    #filterForm .form-control, #filterForm .form-select { min-height: 44px; }
+}

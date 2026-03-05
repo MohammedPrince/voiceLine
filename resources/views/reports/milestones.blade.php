@@ -6,13 +6,12 @@
 
 
 <div class="reports-container">
-
     <!-- Navigation -->
     <ul>
-      <li><a href="/reports"> General Report </a></li>
-      <li><a href="/reports/calls-per-user">Detailed Report</a></li>
-      <li><a href="/reports/voice-calls">Voice Calls Report</a></li>
-      <li><a href="/reports/milestones"  class="active"> Milestones Report </a></li>
+        <li><a href="/reports"> General Report </a></li>
+        <li><a href="/reports/calls-per-user">Detailed Report</a></li>
+        <li><a href="/reports/voice-calls">Voice Calls Report</a></li>
+        <li><a href="/reports/milestones" class="active"> Milestones Report </a></li>
     </ul>
 
     <!-- Page Title -->
@@ -20,7 +19,7 @@
 
     <!-- Calls Table -->
     <div class="table-responsive mt-3">
-        <table class="table table-bordered">
+<table class="table table-bordered milestones-table">
             <thead class="table">
                 <tr>
                     <th>User Name</th>
@@ -30,8 +29,8 @@
             <tbody>
                 @forelse($callsPerUser as $user)
                     <tr>
-                        <td>{{ $user->user_name }}</td>
-                        <td>
+                        <td data-label="User Name">{{ $user->user_name }}</td>
+                        <td data-label="Calls Today">
                             <span class="badge bg-success">
                                 {{ $user->total_calls }}
                             </span>
@@ -47,7 +46,6 @@
             </tbody>
         </table>
     </div>
-
 </div>
 
 @endsection
